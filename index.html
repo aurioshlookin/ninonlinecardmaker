@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criador de Carta Ninja Info</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #2c3e50;
+            background-image: radial-gradient(#34495e 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        /* Estilos específicos da carta */
+        .ninja-card {
+            background-color: #e5deb5; /* Cor de papel envelhecido/areia */
+            border: 12px solid #5a9b75; /* Borda verde característica */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Inputs transparentes na carta */
+        .card-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed rgba(0,0,0,0.3);
+            outline: none;
+            width: 100%;
+            font-family: inherit;
+            color: #333;
+        }
+        
+        .card-input:focus {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .photo-placeholder {
+            cursor: pointer;
+            transition: transform 0.2s;
+            object-fit: cover;
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .photo-placeholder:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .hide-on-print {
+            /* Classe usada durante o download da imagem */
+        }
+        
+        /* Ajuste fino para telas menores */
+        @media (max-width: 1024px) {
+            .app-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-800 p-4 md:p-8 flex items-start justify-center">
+
+    <div class="app-container flex gap-8 w-full max-w-7xl mx-auto">
+        
+        <!-- PAINEL DE CONTROLE -->
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-full lg:w-1/3 flex-shrink-0 hide-on-print">
+            <div class="mb-6 border-b pb-4">
+                <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    Painel de Criação
+                </h1>
+                <p class="text-sm text-gray-500 mt-1">Edite os gráficos aqui. Textos e imagens podem ser editados clicando diretamente na carta!</p>
+            </div>
+
+            <!-- Cor da Borda -->
+            <div class="mb-6">
+                <h2 class="font-semibold text-lg mb-3 border-b-2 border-yellow-500 inline-block">Design</h2>
+                <div class="flex items-center gap-3 text-sm">
+                    <label class="block text-gray-600 font-bold">Cor da Borda:</label>
+                    <input type="color" id="card-border-color" value="#5a9b75" class="w-10 h-10 cursor-pointer rounded border-0 p-0 shadow-sm">
+                </div>
+            </div>
+
+            <!-- Controles do Gráfico Radar (Status) -->
+            <div class="mb-6">
+                <h2 class="font-semibold text-lg mb-3 border-b-2 border-green-500 inline-block">Status de Combate (1-5)</h2>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                        <input type="text" id="label-nin-panel" value="Ninjutsu" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
+                        <input type="range" id="stat-nin" min="1" max="5" step="0.5" value="3" class="w-full accent-green-600">
+                    </div>
+                    <div>
+                        <input type="text" id="label-tai-panel" value="Taijutsu" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
+                        <input type="range" id="stat-tai" min="1" max="5" step="0.5" value="5" class="w-full accent-green-600">
+                    </div>
+                    <div>
+                        <input type="text" id="label-gen-panel" value="Genjutsu" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
+                        <input type="range" id="stat-gen" min="1" max="5" step="0.5" value="1" class="w-full accent-green-600">
+                    </div>
+                    <div>
+                        <input type="text" id="label-int-panel" value="Inteligência" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
+                        <input type="range" id="stat-int" min="1" max="5" step="0.5" value="3" class="w-full accent-green-600">
+                    </div>
+                    <div class="col-span-2">
+                        <input type="text" id="label-str-panel" value="Força" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
+                        <input type="range" id="stat-str" min="1" max="5" step="0.5" value="4" class="w-full accent-green-600">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controles de Missões -->
+            <div class="mb-6">
+                <h2 class="font-semibold text-lg mb-3 border-b-2 border-red-500 inline-block">Missões Concluídas</h2>
+                <div class="grid grid-cols-3 gap-3 text-sm">
+                    <div><label class="block font-bold">Rank S</label><input type="number" id="miss-s" value="0" class="w-full border rounded px-2 py-1"></div>
+                    <div><label class="block font-bold text-red-600">Rank A</label><input type="number" id="miss-a" value="0" class="w-full border rounded px-2 py-1"></div>
+                    <div><label class="block font-bold text-orange-500">Rank B</label><input type="number" id="miss-b" value="11" class="w-full border rounded px-2 py-1"></div>
+                    <div><label class="block font-bold text-green-600">Rank C</label><input type="number" id="miss-c" value="20" class="w-full border rounded px-2 py-1"></div>
+                    <div><label class="block font-bold text-blue-600">Rank D</label><input type="number" id="miss-d" value="35" class="w-full border rounded px-2 py-1"></div>
+                </div>
+            </div>
+
+            <!-- Botão de Download -->
+            <button id="download-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                Baixar Carta como Imagem
+            </button>
+            <p class="text-xs text-center text-gray-400 mt-2">Dica: Clique nas imagens e textos da carta ao lado para personalizá-los diretamente!</p>
+        </div>
+
+        <!-- CARTA NINJA (Preview) -->
+        <div class="flex-grow flex justify-center">
+            <!-- Container com proporções fixas -->
+            <div id="carta-container" class="ninja-card w-[480px] h-[680px] rounded flex flex-col p-4">
+                
+                <!-- Cabeçalho -->
+                <div class="flex justify-between items-center mb-4">
+                    <!-- Símbolo da Folha (Konoha) -->
+                    <div class="w-12 h-12 flex items-center justify-center">
+                        <svg viewBox="0 0 100 100" class="w-10 h-10 text-gray-800" fill="currentColor">
+                            <path d="M50,10 C27.9,10 10,27.9 10,50 C10,72.1 27.9,90 50,90 C72.1,90 90,72.1 90,50 C90,41.5 87.3,33.6 82.8,27.1 L75.7,34.2 C78.4,38.7 80,44.1 80,50 C80,66.5 66.5,80 50,80 C33.5,80 20,66.5 20,50 C20,33.5 33.5,20 50,20 C54.3,20 58.4,20.9 62.1,22.5 L69.5,15.1 C63.7,11.8 57,10 50,10 Z" />
+                            <path d="M60,35 C65,40 65,48 60,53 L45,68 C42,71 37,71 34,68 C31,65 31,60 34,57 L49,42 C51,40 54,40 56,42 C58,44 58,47 56,49 L46,59 C45,60 44,60 43,59 C42,58 42,57 43,56 L51,48 L48,45 L40,53 C38,55 38,58 40,60 C42,62 45,62 47,60 L62,45 C67,40 67,32 62,27 L50,15 L60,35 Z" />
+                            <polygon points="10,40 25,50 15,60" />
+                        </svg>
+                    </div>
+                    
+                    <!-- Fogo e Texto Konoha -->
+                    <div class="flex items-center gap-2">
+                        <div class="bg-red-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold text-xl border-2 border-red-800 shadow-sm">
+                            火
+                        </div>
+                        <h2 class="text-3xl font-bold tracking-widest text-gray-800">木ノ葉</h2>
+                    </div>
+                </div>
+
+                <!-- Seção Superior: Dados e Foto -->
+                <div class="flex gap-4 mb-4 flex-grow">
+                    <!-- Dados -->
+                    <div class="flex-1 flex flex-col justify-end gap-3 pb-4">
+                        <div class="flex items-end">
+                            <span class="font-bold text-sm whitespace-nowrap mr-2">Registro N.º:</span>
+                            <input type="text" value="012561" class="card-input font-mono text-sm">
+                        </div>
+                        <div class="flex items-end">
+                            <span class="font-bold text-sm whitespace-nowrap mr-2">Especialidade:</span>
+                            <input type="text" value="Taijutsu" class="card-input font-bold text-sm">
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-sm">Observações:</span>
+                            <textarea class="card-input text-xs resize-none h-24 bg-white/40 p-1 rounded mt-1" spellcheck="false">Gênio do trabalho duro. Incapaz de usar Ninjutsu ou Genjutsu. Pode abrir os Portões Internos.</textarea>
+                        </div>
+                    </div>
+
+                    <!-- Foto Principal -->
+                    <div class="w-40 flex flex-col items-center justify-end">
+                        <div class="w-32 h-40 bg-white border-2 border-gray-400 p-1 shadow-md rotate-2 mb-2 relative">
+                            <img id="img-main" src="https://i.pinimg.com/236x/8f/2c/8d/8f2c8d5d9990391f1ba4fba97da5f21f.jpg" alt="Ninja" class="w-full h-full object-cover photo-placeholder" title="Clique para trocar a foto">
+                            <input type="file" id="file-main" class="hidden" accept="image/*">
+                        </div>
+                        <div class="w-full bg-[#9cb3d4] border-2 border-[#7a93b5] rounded-sm p-1 text-center shadow-sm">
+                            <input type="text" value="Rock Lee" class="bg-transparent text-center w-full font-bold text-gray-800 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção Inferior: Gráficos e Missões -->
+                <div class="flex-grow flex justify-between items-end relative">
+                    
+                    <!-- Gráfico de Barras (Genérico) -->
+                    <div class="w-24 h-28 bg-white/50 border border-gray-400 p-1 rounded-sm shadow-inner relative bottom-2">
+                        <canvas id="barChart"></canvas>
+                    </div>
+
+                    <!-- Gráfico Radar Principal -->
+                    <div class="w-52 h-52 absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-2">
+                        <canvas id="radarChart"></canvas>
+                        <!-- Rótulos editáveis para estilo oriental/personalizado -->
+                        <input type="text" value="忍" class="absolute top-0 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Ninjutsu -->
+                        <input type="text" value="体" class="absolute top-[35%] right-0 translate-x-1 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Taijutsu -->
+                        <input type="text" value="幻" class="absolute bottom-4 right-4 translate-x-2 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Genjutsu -->
+                        <input type="text" value="知" class="absolute bottom-4 left-4 -translate-x-2 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Inteligência -->
+                        <input type="text" value="力" class="absolute top-[35%] left-0 -translate-x-1 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Força -->
+                    </div>
+
+                    <!-- Missões Completadas -->
+                    <div class="w-24 text-xs">
+                        <div class="font-bold border-b border-gray-500 mb-1 text-center">Missões</div>
+                        <div class="flex justify-between border-b border-gray-400 border-dashed py-0.5"><span>S</span> <span id="disp-s" class="font-mono">0</span></div>
+                        <div class="flex justify-between border-b border-gray-400 border-dashed py-0.5"><span>A</span> <span id="disp-a" class="font-mono">0</span></div>
+                        <div class="flex justify-between border-b border-gray-400 border-dashed py-0.5"><span>B</span> <span id="disp-b" class="font-mono">11</span></div>
+                        <div class="flex justify-between border-b border-gray-400 border-dashed py-0.5"><span>C</span> <span id="disp-c" class="font-mono">20</span></div>
+                        <div class="flex justify-between py-0.5"><span>D</span> <span id="disp-d" class="font-mono">35</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. CONFIGURAÇÃO DE UPLOAD DE IMAGENS ---
+            const setupImageUpload = (imgId, inputId) => {
+                const img = document.getElementById(imgId);
+                const input = document.getElementById(inputId);
+                
+                img.addEventListener('click', () => input.click());
+                
+                input.addEventListener('change', function(e) {
+                    if (e.target.files && e.target.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            img.src = event.target.result;
+                        };
+                        reader.readAsDataURL(e.target.files[0]);
+                    }
+                });
+            };
+
+            setupImageUpload('img-main', 'file-main');
+
+            // --- 2. CONFIGURAÇÃO DOS GRÁFICOS (Chart.js) ---
+            Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
+            
+            // Gráfico Radar (Status)
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            const radarChart = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Ninjutsu', 'Taijutsu', 'Genjutsu', 'Inteligência', 'Força'],
+                    datasets: [{
+                        label: 'Status',
+                        data: [3, 5, 1, 3, 4], // Valores iniciais (Rock Lee aprox)
+                        backgroundColor: 'rgba(220, 38, 38, 0.6)', // Vermelho Translúcido
+                        borderColor: 'rgba(220, 38, 38, 1)',
+                        borderWidth: 1.5,
+                        pointBackgroundColor: 'rgba(220, 38, 38, 1)',
+                        pointRadius: 0 // Esconde os pontos para ficar mais parecido com o anime
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 5,
+                            ticks: { display: false, stepSize: 1 },
+                            grid: {
+                                color: 'rgba(88, 140, 115, 0.5)', // Cor da teia de aranha (verde escuro)
+                                lineWidth: 1.5
+                            },
+                            angleLines: {
+                                color: 'rgba(88, 140, 115, 0.5)',
+                                lineWidth: 1.5
+                            },
+                            pointLabels: {
+                                display: false // Escondemos as labels nativas para usar HTML absoluto (mais fiel visualmente)
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Barras (Canto Inferior Esquerdo)
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            const barChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['A', 'B', 'C'],
+                    datasets: [{
+                        data: [80, 50, 65],
+                        backgroundColor: [
+                            'rgba(220, 38, 38, 0.8)', // Red
+                            'rgba(34, 197, 94, 0.8)', // Green
+                            'rgba(59, 130, 246, 0.8)'  // Blue
+                        ],
+                        borderWidth: 0,
+                        barPercentage: 0.7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { display: false, grid: { display: false } },
+                        y: { display: false, min: 0, max: 100, grid: { display: false } }
+                    },
+                    layout: { padding: 0 }
+                }
+            });
+
+
+            // --- 3. LIGAR O PAINEL DE CONTROLE AOS ELEMENTOS ---
+
+            // Atualizar Gráfico Radar
+            const statInputs = ['nin', 'tai', 'gen', 'int', 'str'];
+            statInputs.forEach((stat, index) => {
+                const input = document.getElementById(`stat-${stat}`);
+                const panelLabel = document.getElementById(`label-${stat}-panel`);
+                
+                input.addEventListener('input', (e) => {
+                    radarChart.data.datasets[0].data[index] = parseFloat(e.target.value);
+                    radarChart.update();
+                });
+                
+                // Atualiza também os rótulos internos do ChartJS
+                panelLabel.addEventListener('input', (e) => {
+                    radarChart.data.labels[index] = e.target.value;
+                    radarChart.update();
+                });
+            });
+
+            // Lógica da Cor da Borda
+            document.getElementById('card-border-color').addEventListener('input', (e) => {
+                document.getElementById('carta-container').style.borderColor = e.target.value;
+            });
+
+            // Atualizar Textos de Missão
+            const missInputs = ['s', 'a', 'b', 'c', 'd'];
+            missInputs.forEach(rank => {
+                const input = document.getElementById(`miss-${rank}`);
+                const display = document.getElementById(`disp-${rank}`);
+                input.addEventListener('input', (e) => {
+                    display.innerText = e.target.value;
+                });
+            });
+
+
+            // --- 4. EXPORTAR COMO IMAGEM ---
+            document.getElementById('download-btn').addEventListener('click', () => {
+                const card = document.getElementById('carta-container');
+                const btn = document.getElementById('download-btn');
+                
+                // Mudar texto do botão para indicar carregamento
+                const originalText = btn.innerHTML;
+                btn.innerHTML = 'Gerando Imagem...';
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+                // Usar html2canvas
+                html2canvas(card, {
+                    backgroundColor: null, // Manter transparente ou fundo da carta
+                    scale: 2, // Maior resolução
+                    useCORS: true // Permite imagens externas se configuradas corretamente
+                }).then(canvas => {
+                    // Criar link de download
+                    const link = document.createElement('a');
+                    link.download = 'minha-carta-ninja.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+
+                    // Restaurar botão
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }).catch(err => {
+                    console.error('Erro ao gerar imagem:', err);
+                    alert('Houve um erro ao gerar a imagem. Tente novamente.');
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
