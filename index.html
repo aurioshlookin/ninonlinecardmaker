@@ -226,36 +226,36 @@
                     <div class="relative w-60 h-60 mr-4 mt-4">
                         <canvas id="radarChart"></canvas>
                         
-                        <!-- Rótulos dinâmicos (Nomes) e Kanjis nas pontas EXATAS do Pentágono -->
+                        <!-- Rótulos dinâmicos (Nomes) e Ranks nas pontas EXATAS do Pentágono -->
                         <!-- Usando transform: translate(-50%, -50%) para centralização precisa e perfeita -->
                         
                         <!-- Topo -->
                         <div class="absolute flex flex-col items-center w-32" style="top: -2%; left: 50%; transform: translate(-50%, -50%);">
-                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">忍</span>
+                            <span id="rank-card-nin" class="text-[12px] font-extrabold text-gray-700 mb-0.5">B</span>
                             <input type="text" id="label-nin-card" value="Drip" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Direita Cima -->
                         <div class="absolute flex flex-col items-center w-32" style="top: 31%; left: 102%; transform: translate(-50%, -50%);">
-                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">体</span>
+                            <span id="rank-card-tai" class="text-[12px] font-extrabold text-gray-700 mb-0.5">B</span>
                             <input type="text" id="label-tai-card" value="Movimentação" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Direita Baixo -->
                         <div class="absolute flex flex-col items-center w-32" style="top: 85%; left: 81%; transform: translate(-50%, -50%);">
-                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">幻</span>
+                            <span id="rank-card-gen" class="text-[12px] font-extrabold text-gray-700 mb-0.5">B</span>
                             <input type="text" id="label-gen-card" value="Habilidade" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Esquerda Baixo -->
                         <div class="absolute flex flex-col items-center w-32" style="top: 85%; left: 19%; transform: translate(-50%, -50%);">
-                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">知</span>
+                            <span id="rank-card-int" class="text-[12px] font-extrabold text-gray-700 mb-0.5">B</span>
                             <input type="text" id="label-int-card" value="Noção" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Esquerda Cima -->
                         <div class="absolute flex flex-col items-center w-32" style="top: 31%; left: -2%; transform: translate(-50%, -50%);">
-                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">力</span>
+                            <span id="rank-card-str" class="text-[12px] font-extrabold text-gray-700 mb-0.5">B</span>
                             <input type="text" id="label-str-card" value="PvP" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                     </div>
@@ -500,12 +500,14 @@
                 const panelLabel = document.getElementById(`label-${stat}-panel`);
                 const cardLabel = document.getElementById(`label-${stat}-card`);
                 const rankDisplay = document.getElementById(`rank-val-${stat}`);
+                const cardRankDisplay = document.getElementById(`rank-card-${stat}`);
                 
                 input.addEventListener('input', (e) => {
                     const val = parseInt(e.target.value);
                     const rankStr = rankLabels[val];
                     
                     rankDisplay.innerText = rankStr; // Atualiza a Letra do Rank na UI
+                    cardRankDisplay.innerText = rankStr; // Atualiza a Letra do Rank no Radar
                     
                     radarChart.data.datasets[0].data[index] = val;
                     radarChart.update();
