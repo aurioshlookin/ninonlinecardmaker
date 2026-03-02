@@ -40,8 +40,6 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        /* Removidas as regras CSS antigas de .printing pois usaremos uma substituição via JS muito mais confiável para o HTML2Canvas */
-
         @media (max-width: 1024px) {
             .app-container {
                 flex-direction: column;
@@ -216,34 +214,34 @@
                         <canvas id="radarChart"></canvas>
                         
                         <!-- Rótulos dinâmicos (Nomes) e Kanjis nas pontas EXATAS do Pentágono -->
-                        <!-- Posições fixas com transform para centralizar perfeitamente no vértice -->
+                        <!-- Removido o uso de `transform: translate()` que bugava a foto no html2canvas -->
                         
                         <!-- Topo (Ninjutsu) -->
-                        <div class="absolute flex flex-col items-center w-32" style="top: -5%; left: 50%; transform: translate(-50%, -50%);">
+                        <div class="absolute flex flex-col items-center w-32" style="top: -6%; left: 50%; margin-left: -4rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">忍</span>
                             <input type="text" id="label-nin-card" value="Ninjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Direita Cima (Taijutsu) -->
-                        <div class="absolute flex flex-col items-center w-32" style="top: 31%; left: 105%; transform: translate(-50%, -50%);">
+                        <div class="absolute flex flex-col items-center w-32" style="top: 26%; right: -3.5rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">体</span>
                             <input type="text" id="label-tai-card" value="Taijutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Direita Baixo (Genjutsu) -->
-                        <div class="absolute flex flex-col items-center w-32" style="top: 85%; left: 85%; transform: translate(-50%, -50%);">
+                        <div class="absolute flex flex-col items-center w-32" style="bottom: -1rem; right: -2.5rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">幻</span>
                             <input type="text" id="label-gen-card" value="Genjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Esquerda Baixo (Inteligência) -->
-                        <div class="absolute flex flex-col items-center w-32" style="top: 85%; left: 15%; transform: translate(-50%, -50%);">
+                        <div class="absolute flex flex-col items-center w-32" style="bottom: -1rem; left: -2.5rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">知</span>
                             <input type="text" id="label-int-card" value="Inteligência" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Esquerda Cima (Força) -->
-                        <div class="absolute flex flex-col items-center w-32" style="top: 31%; left: -5%; transform: translate(-50%, -50%);">
+                        <div class="absolute flex flex-col items-center w-32" style="top: 26%; left: -3.5rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">力</span>
                             <input type="text" id="label-str-card" value="Força" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
@@ -516,7 +514,7 @@
                 document.getElementById('village-name-input').value = optionText;
             });
 
-            // Funções para garantir print perfeito dos inputs e textareas no html2canvas
+            // Funções ajustadas para manter o Background intacto e as fontes perfeitamente alinhadas
             let printReplacements = [];
 
             function replaceInputsForPrint(container) {
@@ -529,35 +527,48 @@
                     replacer.innerText = input.value;
                     replacer.className = input.className;
                     
-                    // Copiar estilos chave para o visual ficar igual ao input
+                    // Copiar estilos chave para o visual ficar igual
                     replacer.style.fontFamily = computed.fontFamily;
                     replacer.style.fontSize = computed.fontSize;
                     replacer.style.fontWeight = computed.fontWeight;
                     replacer.style.color = computed.color;
                     replacer.style.textAlign = computed.textAlign;
-                    replacer.style.lineHeight = computed.lineHeight;
                     replacer.style.letterSpacing = computed.letterSpacing;
                     
-                    // A correção do corte de texto: Permitir transbordo visual ou largura automática
+                    // CRÍTICO: Preservar o fundo que o CSS computou (Isso resolve a falta de fundo nas áreas de texto)
+                    replacer.style.backgroundColor = computed.backgroundColor;
+                    
+                    replacer.style.width = computed.width;
+                    replacer.style.height = computed.height;
+                    replacer.style.padding = computed.padding;
+                    replacer.style.margin = computed.margin;
+                    replacer.style.boxSizing = 'border-box';
+                    
+                    replacer.style.border = 'none'; 
+                    replacer.style.outline = 'none';
+
                     if (isTextarea) {
-                        replacer.style.width = computed.width;
-                        replacer.style.height = computed.height;
                         replacer.style.whiteSpace = 'pre-wrap';
                         replacer.style.wordBreak = 'break-word';
+                        replacer.style.overflow = 'hidden';
+                        replacer.style.lineHeight = computed.lineHeight;
                     } else {
-                        replacer.style.width = 'auto'; // Deixa crescer para não cortar
-                        replacer.style.minWidth = computed.width;
                         replacer.style.whiteSpace = 'nowrap';
+                        replacer.style.overflow = 'visible'; 
+                        
+                        // CRÍTICO: Manter os textos nivelados sem distorcer o layout flexível
+                        replacer.style.display = 'block';
+                        const h = parseFloat(computed.height);
+                        const pt = parseFloat(computed.paddingTop) || 0;
+                        const pb = parseFloat(computed.paddingBottom) || 0;
+                        
+                        // Recalcula a altura da linha idêntica a de um input original
+                        if (!isNaN(h) && h > 0) {
+                            replacer.style.lineHeight = (h - pt - pb) + 'px';
+                        } else {
+                            replacer.style.lineHeight = computed.lineHeight;
+                        }
                     }
-                    
-                    replacer.style.padding = computed.padding;
-                    replacer.style.display = 'flex';
-                    replacer.style.alignItems = isTextarea ? 'flex-start' : 'center';
-                    replacer.style.justifyContent = computed.textAlign === 'center' ? 'center' : (computed.textAlign === 'right' ? 'flex-end' : 'flex-start');
-                    replacer.style.overflow = 'visible'; // CRÍTICO: Não esconder o conteúdo se passar 1 pixel
-                    replacer.style.boxSizing = 'border-box';
-                    replacer.style.border = 'none'; // Some com a borda tracejada no print
-                    replacer.style.background = 'transparent';
 
                     input.parentNode.insertBefore(replacer, input);
                     input.style.display = 'none';
