@@ -6,7 +6,6 @@
     <title>Criador de Carta Ninja Info</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
@@ -98,7 +97,7 @@
             <!-- Controles do Gráfico Radar (Status) -->
             <div class="mb-6">
                 <h2 class="font-semibold text-lg mb-3 border-b-2 border-green-500 inline-block" data-i18n="combat_status">Rank de Atributos</h2>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+                <div class="flex flex-col gap-4 text-sm">
                     <div>
                         <div class="flex justify-between items-end mb-1">
                             <input type="text" id="label-nin-panel" value="Drip" class="bg-transparent text-gray-600 font-bold w-2/3 outline-none border-b border-dashed border-gray-300 focus:border-green-500">
@@ -127,7 +126,7 @@
                         </div>
                         <input type="range" id="stat-int" min="0" max="10" step="1" value="5" class="w-full accent-green-600">
                     </div>
-                    <div class="col-span-2">
+                    <div>
                         <div class="flex justify-between items-end mb-1">
                             <input type="text" id="label-str-panel" value="PvP" class="bg-transparent text-gray-600 font-bold w-2/3 outline-none border-b border-dashed border-gray-300 focus:border-green-500">
                             <span id="rank-val-str" class="font-bold text-blue-600 text-xs">B</span>
@@ -137,12 +136,15 @@
                 </div>
             </div>
 
-            <!-- Botão de Copiar -->
-            <button id="copy-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition flex items-center justify-center gap-2 mt-4">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                <span data-i18n="copy_btn">Copiar Cartão</span>
-            </button>
-            <p class="text-xs text-center text-gray-400 mt-2" data-i18n="hint">Dica: Os textos também podem ser editados clicando neles na própria carta!</p>
+            <!-- Guia de Salvamento -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded text-sm text-blue-800 shadow-inner">
+                <p class="font-bold flex items-center gap-2 mb-2 text-base">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <span data-i18n="save_title">Como salvar?</span>
+                </p>
+                <p data-i18n="save_desc">Para salvar a sua carta em alta qualidade, utilize a ferramenta de captura de tela do seu dispositivo (<strong>Print Screen</strong> ou <strong>Windows + Shift + S</strong>) e recorte a carta.</p>
+                <p class="text-xs text-blue-600 mt-2 font-semibold" data-i18n="hint">Dica: Os textos também podem ser editados clicando neles na própria carta!</p>
+            </div>
         </div>
 
         <!-- CARTA NINJA (Preview) -->
@@ -167,7 +169,7 @@
                             <span id="symbol-text" class="text-white font-bold text-xl relative z-10">火</span>
                             <div id="renegade-slash" class="absolute w-full h-1 bg-gray-900 -rotate-45 hidden z-20 shadow-sm top-1/2 -translate-y-1/2"></div>
                         </div>
-                        <input type="text" id="village-name-input" value="Vila da Folha" class="text-xl font-bold tracking-wider text-gray-800 bg-transparent outline-none w-48 hover:bg-white/50 focus:bg-white/80 rounded cursor-text px-1 text-left" title="Nome da Vila (Editável)">
+                        <input type="text" id="village-name-input" value="Vila da Folha" class="text-xl font-bold tracking-wider text-gray-800 bg-transparent outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text px-1 text-left" title="Nome da Vila (Editável)">
                     </div>
                 </div>
 
@@ -214,7 +216,7 @@
                 <div class="flex-grow flex justify-between items-center relative px-2 pb-6">
                     
                     <!-- Gráfico de Barras -->
-                    <div class="w-32 h-44 bg-white/50 border border-gray-400 p-2 rounded-sm shadow-inner relative z-10 flex flex-col mb-4">
+                    <div class="w-36 h-48 bg-white/50 border border-gray-400 p-2 rounded-sm shadow-inner relative z-10 flex flex-col mb-4">
                         <div class="flex-grow relative w-full">
                             <canvas id="barChart"></canvas>
                         </div>
@@ -225,32 +227,34 @@
                         <canvas id="radarChart"></canvas>
                         
                         <!-- Rótulos dinâmicos (Nomes) e Kanjis nas pontas EXATAS do Pentágono -->
+                        <!-- Usando transform: translate(-50%, -50%) para centralização precisa e perfeita -->
+                        
                         <!-- Topo -->
-                        <div class="absolute flex flex-col items-center w-32" style="top: -6%; left: 50%; margin-left: -4rem;">
+                        <div class="absolute flex flex-col items-center w-32" style="top: -2%; left: 50%; transform: translate(-50%, -50%);">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">忍</span>
                             <input type="text" id="label-nin-card" value="Drip" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Direita Cima -->
-                        <div class="absolute flex flex-col items-center w-32" style="top: 26%; right: -3.5rem;">
+                        <div class="absolute flex flex-col items-center w-32" style="top: 31%; left: 102%; transform: translate(-50%, -50%);">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">体</span>
                             <input type="text" id="label-tai-card" value="Movimentação" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Direita Baixo -->
-                        <div class="absolute flex flex-col items-center w-32" style="bottom: -1rem; right: -2.5rem;">
+                        <div class="absolute flex flex-col items-center w-32" style="top: 85%; left: 81%; transform: translate(-50%, -50%);">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">幻</span>
                             <input type="text" id="label-gen-card" value="Habilidade" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Esquerda Baixo -->
-                        <div class="absolute flex flex-col items-center w-32" style="bottom: -1rem; left: -2.5rem;">
+                        <div class="absolute flex flex-col items-center w-32" style="top: 85%; left: 19%; transform: translate(-50%, -50%);">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">知</span>
                             <input type="text" id="label-int-card" value="Noção" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
                         <!-- Esquerda Cima -->
-                        <div class="absolute flex flex-col items-center w-32" style="top: 26%; left: -3.5rem;">
+                        <div class="absolute flex flex-col items-center w-32" style="top: 31%; left: -2%; transform: translate(-50%, -50%);">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">力</span>
                             <input type="text" id="label-str-card" value="PvP" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
@@ -260,13 +264,6 @@
             </div>
         </div>
 
-    </div>
-
-    <!-- Toast Notification (Aviso de Cópia) -->
-    <div id="toast-notification" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded shadow-xl opacity-0 pointer-events-none translate-y-4 transition-all duration-300 z-50 flex items-center gap-2">
-        <svg id="toast-icon-success" class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-        <svg id="toast-icon-error" class="w-5 h-5 text-red-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-        <span id="toast-message" class="font-semibold text-sm">Cartão copiado!</span>
     </div>
 
     <script>
@@ -284,15 +281,14 @@
                     border_color: "Border Color:",
                     village: "Origin / Village:",
                     combat_status: "Attributes Rank",
-                    copy_btn: "Copy Card",
+                    save_title: "How to save?",
+                    save_desc: "To save your card in high quality, use your device's screen capture tool (<strong>Print Screen</strong> or <strong>Windows + Shift + S</strong>) and crop the card.",
                     hint: "Hint: Texts can also be edited by clicking directly on the card!",
                     rank_label: "Tierlist Rank:",
                     specialty_label: "Specialty:",
                     obs_label: "Notes:",
                     obs_default: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nullam in dui mauris.",
                     upload_text: "Upload<br>Image",
-                    copied_success: "Card copied! Ready to paste (Ctrl+V).",
-                    copied_fail: "Error copying. Browser may not support it.",
                     villages: {
                         'leaf': 'Hidden Leaf',
                         'leaf-r': 'Rogue Leaf',
@@ -310,15 +306,14 @@
                     border_color: "Cor da Borda:",
                     village: "Origem / Vila:",
                     combat_status: "Rank de Atributos",
-                    copy_btn: "Copiar Cartão",
+                    save_title: "Como salvar?",
+                    save_desc: "Para salvar a sua carta em alta qualidade, utilize a ferramenta de captura de tela do seu dispositivo (<strong>Print Screen</strong> ou <strong>Windows + Shift + S</strong>) e recorte a carta.",
                     hint: "Dica: Os textos também podem ser editados clicando neles na própria carta!",
                     rank_label: "Tierlist Rank:",
                     specialty_label: "Especialidade:",
                     obs_label: "Observações:",
                     obs_default: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nullam in dui mauris.",
                     upload_text: "Enviar<br>Imagem",
-                    copied_success: "Cartão copiado! Pronto para colar (Ctrl+V).",
-                    copied_fail: "Erro ao copiar. O navegador pode não suportar.",
                     villages: {
                         'leaf': 'Vila da Folha',
                         'leaf-r': 'Folha (Renegado)',
@@ -352,8 +347,8 @@
                 });
 
                 document.getElementById('village-name-input').value = select.options[select.selectedIndex].text;
+                adjustVillageWidth();
                 
-                // Só reseta a box de observação se ela ainda tiver o default de outra língua
                 const obsBox = document.getElementById('obs-textarea');
                 if (obsBox.value === dict.pt.obs_default || obsBox.value === dict.en.obs_default) {
                     obsBox.value = d.obs_default;
@@ -363,12 +358,8 @@
                 statInputs.forEach((stat, index) => {
                     document.getElementById(`label-${stat}-panel`).value = d.stats[index];
                     document.getElementById(`label-${stat}-card`).value = d.stats[index];
-                    if (window.barChart) {
-                        window.barChart.data.labels[index] = d.stats[index].substring(0, 3);
-                    }
                 });
-                if (window.barChart) window.barChart.update();
-
+                
                 if(lang === 'pt') {
                     document.getElementById('lang-lbl-pt').classList.replace('text-gray-500', 'text-green-600');
                     document.getElementById('lang-lbl-en').classList.replace('text-blue-600', 'text-gray-500');
@@ -377,6 +368,27 @@
                     document.getElementById('lang-lbl-pt').classList.replace('text-green-600', 'text-gray-500');
                 }
             };
+
+            // Auto-Redimensionar o Input do Nome da Vila (Usando o truque do SPAN escondido para 100% de precisão com letter-spacing)
+            const villageNameInput = document.getElementById('village-name-input');
+            const adjustVillageWidth = () => {
+                const span = document.createElement('span');
+                span.style.visibility = 'hidden';
+                span.style.position = 'absolute';
+                span.style.whiteSpace = 'nowrap';
+                span.className = villageNameInput.className; // Copia as classes do tailwind (text-xl, tracking-wider, etc)
+                span.innerText = villageNameInput.value || villageNameInput.placeholder || " ";
+                document.body.appendChild(span);
+                
+                // Pega o tamanho exato no DOM e adiciona um pequeno buffer de respiro
+                villageNameInput.style.width = (span.offsetWidth + 12) + 'px'; 
+                
+                document.body.removeChild(span);
+            };
+            
+            // Ouvir a digitação e chamar a função
+            villageNameInput.addEventListener('input', adjustVillageWidth);
+
 
             // --- 1. CONFIGURAÇÃO DE UPLOAD DE IMAGENS ---
             const setupImageUpload = (inputId, imgId, placeholderId) => {
@@ -402,6 +414,7 @@
             // --- 2. CONFIGURAÇÃO DOS GRÁFICOS (Chart.js) ---
             Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
             const initialData = [5, 5, 5, 5, 5]; // Default em 'B'
+            const initialRanks = initialData.map(val => rankLabels[val]);
             
             // Gráfico Radar
             const ctxRadar = document.getElementById('radarChart').getContext('2d');
@@ -437,12 +450,12 @@
                 }
             });
 
-            // Gráfico de Barras
+            // Gráfico de Barras com as Labels de Ranks embaixo (Eixo X ativado)
             const ctxBar = document.getElementById('barChart').getContext('2d');
             window.barChart = new Chart(ctxBar, {
                 type: 'bar',
                 data: {
-                    labels: ['Dri', 'Mov', 'Hab', 'Noç', 'PvP'],
+                    labels: [...initialRanks], // Agora as labels são as letras do rank (S, A, etc)
                     datasets: [{
                         data: [...initialData],
                         backgroundColor: [
@@ -461,7 +474,15 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     scales: {
-                        x: { display: false }, 
+                        x: { 
+                            display: true, // Mostra o Eixo X
+                            grid: { display: false },
+                            border: { display: false },
+                            ticks: {
+                                font: { size: 10, weight: 'bold', family: "'Noto Sans JP', sans-serif" },
+                                color: '#4b5563' // text-gray-600
+                            }
+                        }, 
                         y: { min: 0, max: 10, display: false } 
                     },
                     layout: { padding: 0 }
@@ -482,18 +503,21 @@
                 
                 input.addEventListener('input', (e) => {
                     const val = parseInt(e.target.value);
-                    rankDisplay.innerText = rankLabels[val]; // Atualiza a Letra do Rank na UI
+                    const rankStr = rankLabels[val];
+                    
+                    rankDisplay.innerText = rankStr; // Atualiza a Letra do Rank na UI
+                    
                     radarChart.data.datasets[0].data[index] = val;
                     radarChart.update();
+                    
                     window.barChart.data.datasets[0].data[index] = val;
+                    window.barChart.data.labels[index] = rankStr; // Atualiza o Rank debaixo do Gráfico de Barra
                     window.barChart.update();
                 });
                 
                 const syncLabels = (val) => {
                     panelLabel.value = val;
                     cardLabel.value = val;
-                    window.barChart.data.labels[index] = val.substring(0, 3);
-                    window.barChart.update();
                 };
 
                 panelLabel.addEventListener('input', (e) => syncLabels(e.target.value));
@@ -529,140 +553,14 @@
 
                 const optionText = e.target.options[e.target.selectedIndex].text;
                 document.getElementById('village-name-input').value = optionText;
+                adjustVillageWidth();
             });
-
-            // Funções ajustadas para cópia e alinhamento impecáveis
-            let printReplacements = [];
-
-            function replaceInputsForPrint(container) {
-                const inputs = container.querySelectorAll('input[type="text"], textarea');
-                inputs.forEach(input => {
-                    const isTextarea = input.tagName === 'TEXTAREA';
-                    const replacer = document.createElement('div');
-                    const computed = window.getComputedStyle(input);
-                    
-                    replacer.innerText = input.value;
-                    replacer.className = input.className;
-                    
-                    // Copiar estilos chaves da fonte
-                    replacer.style.font = computed.font;
-                    replacer.style.color = computed.color;
-                    replacer.style.textAlign = computed.textAlign;
-                    replacer.style.letterSpacing = computed.letterSpacing;
-                    replacer.style.backgroundColor = computed.backgroundColor;
-                    
-                    // Box-model exato
-                    replacer.style.width = computed.width;
-                    replacer.style.height = computed.height;
-                    replacer.style.padding = computed.padding;
-                    replacer.style.margin = computed.margin;
-                    replacer.style.boxSizing = 'border-box';
-                    
-                    // Preservar a Borda Inferior tracejada dos inputs (Tierlist, Especialidade, Atributos)
-                    replacer.style.border = 'none'; 
-                    replacer.style.outline = 'none';
-                    if (!isTextarea) {
-                        replacer.style.borderBottom = computed.borderBottom; 
-                    }
-
-                    if (isTextarea) {
-                        replacer.style.whiteSpace = 'pre-wrap';
-                        replacer.style.wordBreak = 'break-word';
-                        replacer.style.overflow = 'hidden';
-                    } else {
-                        replacer.style.whiteSpace = 'nowrap';
-                        replacer.style.overflow = 'visible'; 
-                        replacer.style.display = 'block'; // Usar bloco e line-height impede o desvio para baixo
-                        replacer.style.lineHeight = computed.lineHeight !== 'normal' ? computed.lineHeight : computed.height;
-                    }
-
-                    input.parentNode.insertBefore(replacer, input);
-                    input.style.display = 'none';
-                    
-                    printReplacements.push({ input, replacer });
-                });
-            }
-
-            function restoreInputsAfterPrint() {
-                printReplacements.forEach(({ input, replacer }) => {
-                    input.style.display = ''; 
-                    replacer.remove(); 
-                });
-                printReplacements = [];
-            }
-
-            function showToast(message, isError = false) {
-                const toast = document.getElementById('toast-notification');
-                const msgEl = document.getElementById('toast-message');
-                const iconSuccess = document.getElementById('toast-icon-success');
-                const iconError = document.getElementById('toast-icon-error');
-                
-                msgEl.innerText = message;
-                
-                if (isError) {
-                    toast.classList.replace('bg-gray-800', 'bg-red-800');
-                    iconSuccess.classList.add('hidden');
-                    iconError.classList.remove('hidden');
-                } else {
-                    toast.classList.replace('bg-red-800', 'bg-gray-800');
-                    iconError.classList.add('hidden');
-                    iconSuccess.classList.remove('hidden');
-                }
-
-                toast.classList.remove('opacity-0', 'translate-y-4');
-                
-                setTimeout(() => {
-                    toast.classList.add('opacity-0', 'translate-y-4');
-                }, 4000); 
-            }
-
-            // --- 4. EXPORTAR COMO IMAGEM (COPIAR CARTÃO) ---
-            document.getElementById('copy-btn').addEventListener('click', () => {
-                const card = document.getElementById('carta-container');
-                const btn = document.getElementById('copy-btn');
-                const lang = document.getElementById('lang-toggle').checked ? 'pt' : 'en';
-                
-                const originalText = btn.innerHTML;
-                btn.innerHTML = 'Copiando...';
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-
-                replaceInputsForPrint(card);
-
-                setTimeout(() => {
-                    html2canvas(card, {
-                        backgroundColor: '#e5deb5', 
-                        scale: 3, 
-                        useCORS: true,
-                        logging: false
-                    }).then(canvas => {
-                        canvas.toBlob(blob => {
-                            if (!blob) {
-                                showToast(dict[lang].copied_fail, true);
-                                return;
-                            }
-                            try {
-                                const item = new ClipboardItem({ 'image/png': blob });
-                                navigator.clipboard.write([item]).then(() => {
-                                    showToast(dict[lang].copied_success);
-                                }).catch(err => {
-                                    console.error('Erro de permissão:', err);
-                                    showToast(dict[lang].copied_fail, true);
-                                });
-                            } catch (e) {
-                                console.error('Clipboard API não suportada:', e);
-                                showToast(dict[lang].copied_fail, true);
-                            }
-                        }, 'image/png');
-                    }).catch(err => {
-                        console.error('Erro ao gerar imagem:', err);
-                        showToast(dict[lang].copied_fail, true);
-                    }).finally(() => {
-                        restoreInputsAfterPrint();
-                        btn.innerHTML = originalText;
-                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    });
-                }, 100);
-            });
+            
+            // Garantir que a vila tem o tamanho correto no carregamento inicial da página
+            setTimeout(adjustVillageWidth, 50); // Timeout leve para garantir renderização da fonte
+            
+            // Ajustar o tamanho da vila se o usuário redimensionar a janela (pois a fonte pode mudar)
+            window.addEventListener('resize', adjustVillageWidth);
 
         });
     </script>
