@@ -84,7 +84,6 @@
                     <div class="flex items-center gap-3">
                         <label class="block text-gray-600 font-bold w-28" data-i18n="village">Origem / Vila:</label>
                         <select id="village-select" class="border rounded px-2 py-2 flex-grow bg-gray-50 outline-none focus:border-blue-500 font-medium text-gray-800">
-                            <!-- Options serão injetados pelo JS de acordo com o idioma -->
                             <option value="leaf">Vila da Folha</option>
                             <option value="leaf-r">Folha (Renegado)</option>
                             <option value="sand">Vila da Areia</option>
@@ -98,27 +97,42 @@
 
             <!-- Controles do Gráfico Radar (Status) -->
             <div class="mb-6">
-                <h2 class="font-semibold text-lg mb-3 border-b-2 border-green-500 inline-block" data-i18n="combat_status">Status de Combate (1-5)</h2>
-                <div class="grid grid-cols-2 gap-3 text-sm">
+                <h2 class="font-semibold text-lg mb-3 border-b-2 border-green-500 inline-block" data-i18n="combat_status">Rank de Atributos</h2>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
                     <div>
-                        <input type="text" id="label-nin-panel" value="Ninjutsu" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
-                        <input type="range" id="stat-nin" min="1" max="5" step="0.5" value="3" class="w-full accent-green-600">
+                        <div class="flex justify-between items-end mb-1">
+                            <input type="text" id="label-nin-panel" value="Drip" class="bg-transparent text-gray-600 font-bold w-2/3 outline-none border-b border-dashed border-gray-300 focus:border-green-500">
+                            <span id="rank-val-nin" class="font-bold text-blue-600 text-xs">B</span>
+                        </div>
+                        <input type="range" id="stat-nin" min="0" max="10" step="1" value="5" class="w-full accent-green-600">
                     </div>
                     <div>
-                        <input type="text" id="label-tai-panel" value="Taijutsu" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
-                        <input type="range" id="stat-tai" min="1" max="5" step="0.5" value="5" class="w-full accent-green-600">
+                        <div class="flex justify-between items-end mb-1">
+                            <input type="text" id="label-tai-panel" value="Movimentação" class="bg-transparent text-gray-600 font-bold w-2/3 outline-none border-b border-dashed border-gray-300 focus:border-green-500">
+                            <span id="rank-val-tai" class="font-bold text-blue-600 text-xs">B</span>
+                        </div>
+                        <input type="range" id="stat-tai" min="0" max="10" step="1" value="5" class="w-full accent-green-600">
                     </div>
                     <div>
-                        <input type="text" id="label-gen-panel" value="Genjutsu" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
-                        <input type="range" id="stat-gen" min="1" max="5" step="0.5" value="1" class="w-full accent-green-600">
+                        <div class="flex justify-between items-end mb-1">
+                            <input type="text" id="label-gen-panel" value="Habilidade" class="bg-transparent text-gray-600 font-bold w-2/3 outline-none border-b border-dashed border-gray-300 focus:border-green-500">
+                            <span id="rank-val-gen" class="font-bold text-blue-600 text-xs">B</span>
+                        </div>
+                        <input type="range" id="stat-gen" min="0" max="10" step="1" value="5" class="w-full accent-green-600">
                     </div>
                     <div>
-                        <input type="text" id="label-int-panel" value="Inteligência" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
-                        <input type="range" id="stat-int" min="1" max="5" step="0.5" value="3" class="w-full accent-green-600">
+                        <div class="flex justify-between items-end mb-1">
+                            <input type="text" id="label-int-panel" value="Noção" class="bg-transparent text-gray-600 font-bold w-2/3 outline-none border-b border-dashed border-gray-300 focus:border-green-500">
+                            <span id="rank-val-int" class="font-bold text-blue-600 text-xs">B</span>
+                        </div>
+                        <input type="range" id="stat-int" min="0" max="10" step="1" value="5" class="w-full accent-green-600">
                     </div>
                     <div class="col-span-2">
-                        <input type="text" id="label-str-panel" value="Força" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
-                        <input type="range" id="stat-str" min="1" max="5" step="0.5" value="4" class="w-full accent-green-600">
+                        <div class="flex justify-between items-end mb-1">
+                            <input type="text" id="label-str-panel" value="PvP" class="bg-transparent text-gray-600 font-bold w-2/3 outline-none border-b border-dashed border-gray-300 focus:border-green-500">
+                            <span id="rank-val-str" class="font-bold text-blue-600 text-xs">B</span>
+                        </div>
+                        <input type="range" id="stat-str" min="0" max="10" step="1" value="5" class="w-full accent-green-600">
                     </div>
                 </div>
             </div>
@@ -149,20 +163,17 @@
                     
                     <!-- Símbolo Dinâmico (Fogo, Água, etc) e Texto -->
                     <div class="flex items-center gap-2 relative">
-                        <!-- Círculo do símbolo -->
                         <div id="village-symbol-container" class="bg-red-600 rounded-full w-10 h-10 flex items-center justify-center border-2 border-red-800 shadow-sm relative overflow-hidden transition-colors flex-shrink-0">
                             <span id="symbol-text" class="text-white font-bold text-xl relative z-10">火</span>
-                            <!-- Risco de renegado (escondido por padrão) -->
                             <div id="renegade-slash" class="absolute w-full h-1 bg-gray-900 -rotate-45 hidden z-20 shadow-sm top-1/2 -translate-y-1/2"></div>
                         </div>
-                        <!-- Ajuste de largura e tamanho para caber o texto todo -->
                         <input type="text" id="village-name-input" value="Vila da Folha" class="text-xl font-bold tracking-wider text-gray-800 bg-transparent outline-none w-48 hover:bg-white/50 focus:bg-white/80 rounded cursor-text px-1 text-left" title="Nome da Vila (Editável)">
                     </div>
                 </div>
 
                 <!-- Seção Superior: Dados e Foto -->
                 <div class="flex gap-4 mb-6"> 
-                    <!-- Dados (Alinhado ao topo) -->
+                    <!-- Dados -->
                     <div class="flex-1 flex flex-col justify-start gap-4 pt-1">
                         <div class="flex items-end">
                             <span class="font-bold text-sm whitespace-nowrap mr-2" data-i18n="rank_label">Tierlist Rank:</span>
@@ -170,11 +181,11 @@
                         </div>
                         <div class="flex items-end">
                             <span class="font-bold text-sm whitespace-nowrap mr-2" data-i18n="specialty_label">Especialidade:</span>
-                            <input type="text" value="Taijutsu" class="card-input font-bold text-sm">
+                            <input type="text" value="Nenhuma" class="card-input font-bold text-sm">
                         </div>
                         <div class="flex flex-col">
                             <span class="font-bold text-sm" data-i18n="obs_label">Observações:</span>
-                            <textarea id="obs-textarea" class="card-input text-xs resize-none h-32 bg-white/40 p-2 rounded mt-1 leading-relaxed" spellcheck="false">Gênio do trabalho duro. Incapaz de usar Ninjutsu ou Genjutsu. Pode abrir os Portões Internos.</textarea>
+                            <textarea id="obs-textarea" class="card-input text-xs resize-none h-32 bg-white/40 p-2 rounded mt-1 leading-relaxed" spellcheck="false">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nullam in dui mauris.</textarea>
                         </div>
                     </div>
 
@@ -194,15 +205,15 @@
                             <input type="file" id="file-main" class="hidden" accept="image/*">
                         </div>
                         <div class="w-full bg-[#9cb3d4] border-2 border-[#7a93b5] rounded-sm p-1 text-center shadow-sm">
-                            <input type="text" value="Rock Lee" class="bg-transparent text-center w-full font-bold text-gray-800 outline-none">
+                            <input type="text" value="Nome" class="bg-transparent text-center w-full font-bold text-gray-800 outline-none">
                         </div>
                     </div>
                 </div>
 
-                <!-- Seção Inferior: Gráficos (Maior Destaque) -->
+                <!-- Seção Inferior: Gráficos -->
                 <div class="flex-grow flex justify-between items-center relative px-2 pb-6">
                     
-                    <!-- Gráfico de Barras (Apenas Barras) -->
+                    <!-- Gráfico de Barras -->
                     <div class="w-32 h-44 bg-white/50 border border-gray-400 p-2 rounded-sm shadow-inner relative z-10 flex flex-col mb-4">
                         <div class="flex-grow relative w-full">
                             <canvas id="barChart"></canvas>
@@ -214,36 +225,34 @@
                         <canvas id="radarChart"></canvas>
                         
                         <!-- Rótulos dinâmicos (Nomes) e Kanjis nas pontas EXATAS do Pentágono -->
-                        <!-- Removido o uso de `transform: translate()` que bugava a foto no html2canvas -->
-                        
-                        <!-- Topo (Ninjutsu) -->
+                        <!-- Topo -->
                         <div class="absolute flex flex-col items-center w-32" style="top: -6%; left: 50%; margin-left: -4rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">忍</span>
-                            <input type="text" id="label-nin-card" value="Ninjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                            <input type="text" id="label-nin-card" value="Drip" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
-                        <!-- Direita Cima (Taijutsu) -->
+                        <!-- Direita Cima -->
                         <div class="absolute flex flex-col items-center w-32" style="top: 26%; right: -3.5rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">体</span>
-                            <input type="text" id="label-tai-card" value="Taijutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                            <input type="text" id="label-tai-card" value="Movimentação" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
-                        <!-- Direita Baixo (Genjutsu) -->
+                        <!-- Direita Baixo -->
                         <div class="absolute flex flex-col items-center w-32" style="bottom: -1rem; right: -2.5rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">幻</span>
-                            <input type="text" id="label-gen-card" value="Genjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                            <input type="text" id="label-gen-card" value="Habilidade" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
-                        <!-- Esquerda Baixo (Inteligência) -->
+                        <!-- Esquerda Baixo -->
                         <div class="absolute flex flex-col items-center w-32" style="bottom: -1rem; left: -2.5rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">知</span>
-                            <input type="text" id="label-int-card" value="Inteligência" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                            <input type="text" id="label-int-card" value="Noção" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                         
-                        <!-- Esquerda Cima (Força) -->
+                        <!-- Esquerda Cima -->
                         <div class="absolute flex flex-col items-center w-32" style="top: 26%; left: -3.5rem;">
                             <span class="text-[10px] font-bold text-gray-500 mb-0.5">力</span>
-                            <input type="text" id="label-str-card" value="Força" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                            <input type="text" id="label-str-card" value="PvP" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                     </div>
 
@@ -263,6 +272,9 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
+            // Array de Ranks
+            const rankLabels = ['?', 'D', 'D+', 'C', 'C+', 'B', 'B+', 'A', 'A+', 'S', 'S+'];
+
             // --- 0. DICIONÁRIO E INTERNACIONALIZAÇÃO (i18n) ---
             const dict = {
                 en: {
@@ -271,13 +283,13 @@
                     design: "Design",
                     border_color: "Border Color:",
                     village: "Origin / Village:",
-                    combat_status: "Combat Status (1-5)",
+                    combat_status: "Attributes Rank",
                     copy_btn: "Copy Card",
                     hint: "Hint: Texts can also be edited by clicking directly on the card!",
                     rank_label: "Tierlist Rank:",
                     specialty_label: "Specialty:",
                     obs_label: "Notes:",
-                    obs_default: "Genius of hard work. Unable to use Ninjutsu or Genjutsu. Can open the Inner Gates.",
+                    obs_default: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nullam in dui mauris.",
                     upload_text: "Upload<br>Image",
                     copied_success: "Card copied! Ready to paste (Ctrl+V).",
                     copied_fail: "Error copying. Browser may not support it.",
@@ -289,7 +301,7 @@
                         'mist': 'Hidden Mist',
                         'mist-r': 'Rogue Mist'
                     },
-                    stats: ['Ninjutsu', 'Taijutsu', 'Genjutsu', 'Intelligence', 'Strength']
+                    stats: ['Drip', 'Movement', 'Skill', 'Awareness', 'PvP']
                 },
                 pt: {
                     panel_title: "Painel de Criação",
@@ -297,13 +309,13 @@
                     design: "Design",
                     border_color: "Cor da Borda:",
                     village: "Origem / Vila:",
-                    combat_status: "Status de Combate (1-5)",
+                    combat_status: "Rank de Atributos",
                     copy_btn: "Copiar Cartão",
                     hint: "Dica: Os textos também podem ser editados clicando neles na própria carta!",
                     rank_label: "Tierlist Rank:",
                     specialty_label: "Especialidade:",
                     obs_label: "Observações:",
-                    obs_default: "Gênio do trabalho duro. Incapaz de usar Ninjutsu ou Genjutsu. Pode abrir os Portões Internos.",
+                    obs_default: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent commodo cursus magna, vel scelerisque nisl consectetur et. Nullam in dui mauris.",
                     upload_text: "Enviar<br>Imagem",
                     copied_success: "Cartão copiado! Pronto para colar (Ctrl+V).",
                     copied_fail: "Erro ao copiar. O navegador pode não suportar.",
@@ -315,7 +327,7 @@
                         'mist': 'Vila da Névoa',
                         'mist-r': 'Névoa (Renegado)'
                     },
-                    stats: ['Ninjutsu', 'Taijutsu', 'Genjutsu', 'Inteligência', 'Força']
+                    stats: ['Drip', 'Movimentação', 'Habilidade', 'Noção', 'PvP']
                 }
             };
 
@@ -340,7 +352,12 @@
                 });
 
                 document.getElementById('village-name-input').value = select.options[select.selectedIndex].text;
-                document.getElementById('obs-textarea').value = d.obs_default;
+                
+                // Só reseta a box de observação se ela ainda tiver o default de outra língua
+                const obsBox = document.getElementById('obs-textarea');
+                if (obsBox.value === dict.pt.obs_default || obsBox.value === dict.en.obs_default) {
+                    obsBox.value = d.obs_default;
+                }
 
                 const statInputs = ['nin', 'tai', 'gen', 'int', 'str'];
                 statInputs.forEach((stat, index) => {
@@ -384,14 +401,14 @@
 
             // --- 2. CONFIGURAÇÃO DOS GRÁFICOS (Chart.js) ---
             Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
-            const initialData = [3, 5, 1, 3, 4];
+            const initialData = [5, 5, 5, 5, 5]; // Default em 'B'
             
             // Gráfico Radar
             const ctxRadar = document.getElementById('radarChart').getContext('2d');
             const radarChart = new Chart(ctxRadar, {
                 type: 'radar',
                 data: {
-                    labels: ['Ninjutsu', 'Taijutsu', 'Genjutsu', 'Inteligência', 'Força'],
+                    labels: ['Drip', 'Movimentação', 'Habilidade', 'Noção', 'PvP'],
                     datasets: [{
                         label: 'Status',
                         data: [...initialData],
@@ -405,15 +422,13 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: {
-                        padding: 10 // Dá um pequeno respiro para o gráfico não cortar as pontas
-                    },
+                    layout: { padding: 10 },
                     plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     scales: {
                         r: {
                             min: 0,
-                            max: 5,
-                            ticks: { display: false, stepSize: 1 },
+                            max: 10,
+                            ticks: { display: false, stepSize: 2 },
                             grid: { color: 'rgba(88, 140, 115, 0.5)', lineWidth: 1.5 },
                             angleLines: { color: 'rgba(88, 140, 115, 0.5)', lineWidth: 1.5 },
                             pointLabels: { display: false }
@@ -427,7 +442,7 @@
             window.barChart = new Chart(ctxBar, {
                 type: 'bar',
                 data: {
-                    labels: ['Nin', 'Tai', 'Gen', 'Int', 'For'],
+                    labels: ['Dri', 'Mov', 'Hab', 'Noç', 'PvP'],
                     datasets: [{
                         data: [...initialData],
                         backgroundColor: [
@@ -447,7 +462,7 @@
                     plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     scales: {
                         x: { display: false }, 
-                        y: { min: 0, max: 5, display: false } 
+                        y: { min: 0, max: 10, display: false } 
                     },
                     layout: { padding: 0 }
                 }
@@ -463,9 +478,11 @@
                 const input = document.getElementById(`stat-${stat}`);
                 const panelLabel = document.getElementById(`label-${stat}-panel`);
                 const cardLabel = document.getElementById(`label-${stat}-card`);
+                const rankDisplay = document.getElementById(`rank-val-${stat}`);
                 
                 input.addEventListener('input', (e) => {
-                    const val = parseFloat(e.target.value);
+                    const val = parseInt(e.target.value);
+                    rankDisplay.innerText = rankLabels[val]; // Atualiza a Letra do Rank na UI
                     radarChart.data.datasets[0].data[index] = val;
                     radarChart.update();
                     window.barChart.data.datasets[0].data[index] = val;
@@ -514,7 +531,7 @@
                 document.getElementById('village-name-input').value = optionText;
             });
 
-            // Funções ajustadas para manter o Background intacto e as fontes perfeitamente alinhadas
+            // Funções ajustadas para cópia e alinhamento impecáveis
             let printReplacements = [];
 
             function replaceInputsForPrint(container) {
@@ -527,47 +544,36 @@
                     replacer.innerText = input.value;
                     replacer.className = input.className;
                     
-                    // Copiar estilos chave para o visual ficar igual
-                    replacer.style.fontFamily = computed.fontFamily;
-                    replacer.style.fontSize = computed.fontSize;
-                    replacer.style.fontWeight = computed.fontWeight;
+                    // Copiar estilos chaves da fonte
+                    replacer.style.font = computed.font;
                     replacer.style.color = computed.color;
                     replacer.style.textAlign = computed.textAlign;
                     replacer.style.letterSpacing = computed.letterSpacing;
-                    
-                    // CRÍTICO: Preservar o fundo que o CSS computou (Isso resolve a falta de fundo nas áreas de texto)
                     replacer.style.backgroundColor = computed.backgroundColor;
                     
+                    // Box-model exato
                     replacer.style.width = computed.width;
                     replacer.style.height = computed.height;
                     replacer.style.padding = computed.padding;
                     replacer.style.margin = computed.margin;
                     replacer.style.boxSizing = 'border-box';
                     
+                    // Preservar a Borda Inferior tracejada dos inputs (Tierlist, Especialidade, Atributos)
                     replacer.style.border = 'none'; 
                     replacer.style.outline = 'none';
+                    if (!isTextarea) {
+                        replacer.style.borderBottom = computed.borderBottom; 
+                    }
 
                     if (isTextarea) {
                         replacer.style.whiteSpace = 'pre-wrap';
                         replacer.style.wordBreak = 'break-word';
                         replacer.style.overflow = 'hidden';
-                        replacer.style.lineHeight = computed.lineHeight;
                     } else {
                         replacer.style.whiteSpace = 'nowrap';
                         replacer.style.overflow = 'visible'; 
-                        
-                        // CRÍTICO: Manter os textos nivelados sem distorcer o layout flexível
-                        replacer.style.display = 'block';
-                        const h = parseFloat(computed.height);
-                        const pt = parseFloat(computed.paddingTop) || 0;
-                        const pb = parseFloat(computed.paddingBottom) || 0;
-                        
-                        // Recalcula a altura da linha idêntica a de um input original
-                        if (!isNaN(h) && h > 0) {
-                            replacer.style.lineHeight = (h - pt - pb) + 'px';
-                        } else {
-                            replacer.style.lineHeight = computed.lineHeight;
-                        }
+                        replacer.style.display = 'block'; // Usar bloco e line-height impede o desvio para baixo
+                        replacer.style.lineHeight = computed.lineHeight !== 'normal' ? computed.lineHeight : computed.height;
                     }
 
                     input.parentNode.insertBefore(replacer, input);
@@ -579,13 +585,12 @@
 
             function restoreInputsAfterPrint() {
                 printReplacements.forEach(({ input, replacer }) => {
-                    input.style.display = ''; // Restaura
-                    replacer.remove(); // Limpa a div falsa
+                    input.style.display = ''; 
+                    replacer.remove(); 
                 });
                 printReplacements = [];
             }
 
-            // Função para exibir o aviso verde na tela
             function showToast(message, isError = false) {
                 const toast = document.getElementById('toast-notification');
                 const msgEl = document.getElementById('toast-message');
@@ -608,10 +613,10 @@
                 
                 setTimeout(() => {
                     toast.classList.add('opacity-0', 'translate-y-4');
-                }, 4000); // Some depois de 4 segundos
+                }, 4000); 
             }
 
-            // --- 4. EXPORTAR COMO IMAGEM (COPIAR CARTÃO NO CTRL+C) ---
+            // --- 4. EXPORTAR COMO IMAGEM (COPIAR CARTÃO) ---
             document.getElementById('copy-btn').addEventListener('click', () => {
                 const card = document.getElementById('carta-container');
                 const btn = document.getElementById('copy-btn');
@@ -621,7 +626,6 @@
                 btn.innerHTML = 'Copiando...';
                 btn.classList.add('opacity-50', 'cursor-not-allowed');
 
-                // Prepara a carta substituindo inputs por divs normais para evitar bugs do html2canvas
                 replaceInputsForPrint(card);
 
                 setTimeout(() => {
@@ -641,7 +645,7 @@
                                 navigator.clipboard.write([item]).then(() => {
                                     showToast(dict[lang].copied_success);
                                 }).catch(err => {
-                                    console.error('Erro de permissão na área de transferência:', err);
+                                    console.error('Erro de permissão:', err);
                                     showToast(dict[lang].copied_fail, true);
                                 });
                             } catch (e) {
@@ -653,7 +657,6 @@
                         console.error('Erro ao gerar imagem:', err);
                         showToast(dict[lang].copied_fail, true);
                     }).finally(() => {
-                        // Restaura os inputs para edição após o print
                         restoreInputsAfterPrint();
                         btn.innerHTML = originalText;
                         btn.classList.remove('opacity-50', 'cursor-not-allowed');
