@@ -40,6 +40,8 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
+        /* Removidas as regras CSS antigas de .printing pois usaremos uma substituição via JS muito mais confiável para o HTML2Canvas */
+
         @media (max-width: 1024px) {
             .app-container {
                 flex-direction: column;
@@ -123,10 +125,10 @@
                 </div>
             </div>
 
-            <!-- Botão de Download -->
-            <button id="download-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition flex items-center justify-center gap-2 mt-4">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                <span data-i18n="download_btn">Baixar Carta como Imagem</span>
+            <!-- Botão de Copiar -->
+            <button id="copy-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition flex items-center justify-center gap-2 mt-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                <span data-i18n="copy_btn">Copiar Cartão</span>
             </button>
             <p class="text-xs text-center text-gray-400 mt-2" data-i18n="hint">Dica: Os textos também podem ser editados clicando neles na própria carta!</p>
         </div>
@@ -181,13 +183,16 @@
                     <!-- Foto Principal -->
                     <div class="w-40 flex flex-col items-center justify-start">
                         <div class="w-32 h-40 bg-white border-2 border-gray-400 p-1 shadow-md rotate-2 mb-3 relative cursor-pointer group" onclick="document.getElementById('file-main').click()">
-                            <!-- Mensagem "Enviar Imagem" fixa no fundo -->
-                            <div class="absolute inset-1 border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center text-gray-400 z-0">
-                                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            
+                            <!-- Placeholder "Enviar Imagem" -->
+                            <div id="image-placeholder" class="absolute inset-1 border-2 border-dashed border-gray-400 bg-white flex flex-col items-center justify-center text-gray-500 z-10">
+                                <span class="text-3xl font-light mb-1">+</span>
                                 <span data-i18n="upload_text" class="text-xs font-bold text-center leading-tight">Enviar<br>Imagem</span>
                             </div>
-                            <!-- Imagem (Transparente no início para mostrar o fundo) -->
-                            <img id="img-main" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" class="w-full h-full object-cover relative z-10" title="Clique para alterar a foto">
+
+                            <!-- Imagem Real -->
+                            <img id="img-main" src="" alt="Ninja" class="w-full h-full object-cover relative z-20 hidden" title="Clique para alterar a foto">
+                            
                             <input type="file" id="file-main" class="hidden" accept="image/*">
                         </div>
                         <div class="w-full bg-[#9cb3d4] border-2 border-[#7a93b5] rounded-sm p-1 text-center shadow-sm">
@@ -206,30 +211,41 @@
                         </div>
                     </div>
 
-                    <!-- Gráfico Radar Principal (Maior) -->
-                    <div class="relative w-64 h-64 mr-2">
+                    <!-- Gráfico Radar Principal -->
+                    <div class="relative w-60 h-60 mr-4 mt-4">
                         <canvas id="radarChart"></canvas>
                         
-                        <!-- Rótulos dinâmicos (Nomes) e Kanjis (Pontas externas) -->
-                        <div class="absolute -top-7 left-1/2 -translate-x-1/2 flex flex-col items-center">
-                            <span class="text-xs font-bold text-gray-500 mb-0.5">忍</span> <!-- Kanji fora -->
-                            <input type="text" id="label-nin-card" value="Ninjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        <!-- Rótulos dinâmicos (Nomes) e Kanjis nas pontas EXATAS do Pentágono -->
+                        <!-- Posições fixas com transform para centralizar perfeitamente no vértice -->
+                        
+                        <!-- Topo (Ninjutsu) -->
+                        <div class="absolute flex flex-col items-center w-32" style="top: -5%; left: 50%; transform: translate(-50%, -50%);">
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">忍</span>
+                            <input type="text" id="label-nin-card" value="Ninjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
-                        <div class="absolute top-[26%] -right-10 flex flex-col items-center">
-                            <span class="text-xs font-bold text-gray-500 mb-0.5">体</span>
-                            <input type="text" id="label-tai-card" value="Taijutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        
+                        <!-- Direita Cima (Taijutsu) -->
+                        <div class="absolute flex flex-col items-center w-32" style="top: 31%; left: 105%; transform: translate(-50%, -50%);">
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">体</span>
+                            <input type="text" id="label-tai-card" value="Taijutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
-                        <div class="absolute -bottom-6 -right-6 flex flex-col items-center">
-                            <span class="text-xs font-bold text-gray-500 mb-0.5">幻</span>
-                            <input type="text" id="label-gen-card" value="Genjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        
+                        <!-- Direita Baixo (Genjutsu) -->
+                        <div class="absolute flex flex-col items-center w-32" style="top: 85%; left: 85%; transform: translate(-50%, -50%);">
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">幻</span>
+                            <input type="text" id="label-gen-card" value="Genjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
-                        <div class="absolute -bottom-6 -left-6 flex flex-col items-center">
-                            <span class="text-xs font-bold text-gray-500 mb-0.5">知</span>
-                            <input type="text" id="label-int-card" value="Inteligência" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        
+                        <!-- Esquerda Baixo (Inteligência) -->
+                        <div class="absolute flex flex-col items-center w-32" style="top: 85%; left: 15%; transform: translate(-50%, -50%);">
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">知</span>
+                            <input type="text" id="label-int-card" value="Inteligência" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
-                        <div class="absolute top-[26%] -left-10 flex flex-col items-center">
-                            <span class="text-xs font-bold text-gray-500 mb-0.5">力</span>
-                            <input type="text" id="label-str-card" value="Força" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        
+                        <!-- Esquerda Cima (Força) -->
+                        <div class="absolute flex flex-col items-center w-32" style="top: 31%; left: -5%; transform: translate(-50%, -50%);">
+                            <span class="text-[10px] font-bold text-gray-500 mb-0.5">力</span>
+                            <input type="text" id="label-str-card" value="Força" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-full outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
                         </div>
                     </div>
 
@@ -237,6 +253,13 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- Toast Notification (Aviso de Cópia) -->
+    <div id="toast-notification" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded shadow-xl opacity-0 pointer-events-none translate-y-4 transition-all duration-300 z-50 flex items-center gap-2">
+        <svg id="toast-icon-success" class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+        <svg id="toast-icon-error" class="w-5 h-5 text-red-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        <span id="toast-message" class="font-semibold text-sm">Cartão copiado!</span>
     </div>
 
     <script>
@@ -251,13 +274,15 @@
                     border_color: "Border Color:",
                     village: "Origin / Village:",
                     combat_status: "Combat Status (1-5)",
-                    download_btn: "Download Card as Image",
+                    copy_btn: "Copy Card",
                     hint: "Hint: Texts can also be edited by clicking directly on the card!",
                     rank_label: "Tierlist Rank:",
                     specialty_label: "Specialty:",
                     obs_label: "Notes:",
                     obs_default: "Genius of hard work. Unable to use Ninjutsu or Genjutsu. Can open the Inner Gates.",
                     upload_text: "Upload<br>Image",
+                    copied_success: "Card copied! Ready to paste (Ctrl+V).",
+                    copied_fail: "Error copying. Browser may not support it.",
                     villages: {
                         'leaf': 'Hidden Leaf',
                         'leaf-r': 'Rogue Leaf',
@@ -275,13 +300,15 @@
                     border_color: "Cor da Borda:",
                     village: "Origem / Vila:",
                     combat_status: "Status de Combate (1-5)",
-                    download_btn: "Baixar Carta como Imagem",
+                    copy_btn: "Copiar Cartão",
                     hint: "Dica: Os textos também podem ser editados clicando neles na própria carta!",
                     rank_label: "Tierlist Rank:",
                     specialty_label: "Especialidade:",
                     obs_label: "Observações:",
                     obs_default: "Gênio do trabalho duro. Incapaz de usar Ninjutsu ou Genjutsu. Pode abrir os Portões Internos.",
                     upload_text: "Enviar<br>Imagem",
+                    copied_success: "Cartão copiado! Pronto para colar (Ctrl+V).",
+                    copied_fail: "Erro ao copiar. O navegador pode não suportar.",
                     villages: {
                         'leaf': 'Vila da Folha',
                         'leaf-r': 'Folha (Renegado)',
@@ -294,7 +321,7 @@
                 }
             };
 
-            // Detectar Idioma (se é derivado de pt, usa PT. Senão, EN)
+            // Detectar Idioma
             const userLang = (navigator.language || navigator.userLanguage).toLowerCase();
             let isPt = userLang.startsWith('pt');
             
@@ -304,25 +331,19 @@
             const applyLanguage = (lang) => {
                 const d = dict[lang];
 
-                // Atualizar textos fixos
                 document.querySelectorAll('[data-i18n]').forEach(el => {
                     const key = el.getAttribute('data-i18n');
                     if (d[key]) el.innerHTML = d[key];
                 });
 
-                // Atualizar opções do Select (Dropdown)
                 const select = document.getElementById('village-select');
                 Array.from(select.options).forEach(opt => {
                     opt.text = d.villages[opt.value];
                 });
 
-                // Atualizar Texto Principal da Vila na Carta p/ ficar sincronizado
                 document.getElementById('village-name-input').value = select.options[select.selectedIndex].text;
-
-                // Atualizar Textarea de Observações
                 document.getElementById('obs-textarea').value = d.obs_default;
 
-                // Atualizar Status / Atributos
                 const statInputs = ['nin', 'tai', 'gen', 'int', 'str'];
                 statInputs.forEach((stat, index) => {
                     document.getElementById(`label-${stat}-panel`).value = d.stats[index];
@@ -333,7 +354,6 @@
                 });
                 if (window.barChart) window.barChart.update();
 
-                // Destaque visual do toggle
                 if(lang === 'pt') {
                     document.getElementById('lang-lbl-pt').classList.replace('text-gray-500', 'text-green-600');
                     document.getElementById('lang-lbl-en').classList.replace('text-blue-600', 'text-gray-500');
@@ -344,22 +364,25 @@
             };
 
             // --- 1. CONFIGURAÇÃO DE UPLOAD DE IMAGENS ---
-            const setupImageUpload = (inputId, imgId) => {
+            const setupImageUpload = (inputId, imgId, placeholderId) => {
                 const input = document.getElementById(inputId);
                 const img = document.getElementById(imgId);
+                const placeholder = document.getElementById(placeholderId);
                 
                 input.addEventListener('change', function(e) {
                     if (e.target.files && e.target.files[0]) {
                         const reader = new FileReader();
                         reader.onload = function(event) {
                             img.src = event.target.result;
+                            img.classList.remove('hidden');
+                            if (placeholder) placeholder.style.display = 'none';
                         };
                         reader.readAsDataURL(e.target.files[0]);
                     }
                 });
             };
 
-            setupImageUpload('file-main', 'img-main');
+            setupImageUpload('file-main', 'img-main', 'image-placeholder');
 
             // --- 2. CONFIGURAÇÃO DOS GRÁFICOS (Chart.js) ---
             Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
@@ -374,7 +397,7 @@
                     datasets: [{
                         label: 'Status',
                         data: [...initialData],
-                        backgroundColor: 'rgba(220, 38, 38, 0.6)', // Vermelho Translúcido
+                        backgroundColor: 'rgba(220, 38, 38, 0.6)', 
                         borderColor: 'rgba(220, 38, 38, 1)',
                         borderWidth: 1.5,
                         pointBackgroundColor: 'rgba(220, 38, 38, 1)',
@@ -384,6 +407,9 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: 10 // Dá um pequeno respiro para o gráfico não cortar as pontas
+                    },
                     plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     scales: {
                         r: {
@@ -407,11 +433,11 @@
                     datasets: [{
                         data: [...initialData],
                         backgroundColor: [
-                            'rgba(220, 38, 38, 0.8)',   // Vermelho (Nin)
-                            'rgba(34, 197, 94, 0.8)',   // Verde (Tai)
-                            'rgba(168, 85, 247, 0.8)',  // Roxo (Gen)
-                            'rgba(59, 130, 246, 0.8)',  // Azul (Int)
-                            'rgba(234, 179, 8, 0.8)'    // Amarelo (For)
+                            'rgba(220, 38, 38, 0.8)',   
+                            'rgba(34, 197, 94, 0.8)',   
+                            'rgba(168, 85, 247, 0.8)',  
+                            'rgba(59, 130, 246, 0.8)',  
+                            'rgba(234, 179, 8, 0.8)'    
                         ],
                         borderWidth: 0,
                         borderRadius: 2
@@ -422,8 +448,8 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     scales: {
-                        x: { display: false }, // Remove Nomes debaixo
-                        y: { min: 0, max: 5, display: false } // Remove eixos laterais
+                        x: { display: false }, 
+                        y: { min: 0, max: 5, display: false } 
                     },
                     layout: { padding: 0 }
                 }
@@ -431,19 +457,15 @@
 
 
             // --- 3. LIGAR O PAINEL DE CONTROLE AOS ELEMENTOS ---
-
-            // Inicializar Idioma após carregar o BarChart
             applyLanguage(isPt ? 'pt' : 'en');
             langToggle.addEventListener('change', (e) => applyLanguage(e.target.checked ? 'pt' : 'en'));
 
-            // Sincronizar Gráficos Simultaneamente
             const statInputsList = ['nin', 'tai', 'gen', 'int', 'str'];
             statInputsList.forEach((stat, index) => {
                 const input = document.getElementById(`stat-${stat}`);
                 const panelLabel = document.getElementById(`label-${stat}-panel`);
                 const cardLabel = document.getElementById(`label-${stat}-card`);
                 
-                // Mudar valor numérico nas barras
                 input.addEventListener('input', (e) => {
                     const val = parseFloat(e.target.value);
                     radarChart.data.datasets[0].data[index] = val;
@@ -452,7 +474,6 @@
                     window.barChart.update();
                 });
                 
-                // Sincronizar mudança de Nomes dos status
                 const syncLabels = (val) => {
                     panelLabel.value = val;
                     cardLabel.value = val;
@@ -464,12 +485,10 @@
                 cardLabel.addEventListener('input', (e) => syncLabels(e.target.value));
             });
 
-            // Lógica da Cor da Borda
             document.getElementById('card-border-color').addEventListener('input', (e) => {
                 document.getElementById('carta-container').style.borderColor = e.target.value;
             });
 
-            // Seletor de Vilas (Muda a Cor do Símbolo, o Kanji, o Risco e Sincroniza o Nome)
             const configs = {
                 'leaf':   { s: '火', bg: '#dc2626', r: false },
                 'leaf-r': { s: '火', bg: '#6b7280', r: true },
@@ -493,43 +512,142 @@
                 if (chosen.r) slash.classList.remove('hidden');
                 else slash.classList.add('hidden');
 
-                // Sincronizar o input de nome da vila na carta com o texto atual da option
                 const optionText = e.target.options[e.target.selectedIndex].text;
                 document.getElementById('village-name-input').value = optionText;
             });
 
-            // Evitar quebra do input de Vila se o usuário escrever algo muito gigante.
-            document.getElementById('village-name-input').addEventListener('input', (e) => {
-                // Aqui o input é livre para edição manual, a sincronização é unidirecional (select -> input)
-            });
+            // Funções para garantir print perfeito dos inputs e textareas no html2canvas
+            let printReplacements = [];
 
-            // --- 4. EXPORTAR COMO IMAGEM ---
-            document.getElementById('download-btn').addEventListener('click', () => {
+            function replaceInputsForPrint(container) {
+                const inputs = container.querySelectorAll('input[type="text"], textarea');
+                inputs.forEach(input => {
+                    const isTextarea = input.tagName === 'TEXTAREA';
+                    const replacer = document.createElement('div');
+                    const computed = window.getComputedStyle(input);
+                    
+                    replacer.innerText = input.value;
+                    replacer.className = input.className;
+                    
+                    // Copiar estilos chave para o visual ficar igual ao input
+                    replacer.style.fontFamily = computed.fontFamily;
+                    replacer.style.fontSize = computed.fontSize;
+                    replacer.style.fontWeight = computed.fontWeight;
+                    replacer.style.color = computed.color;
+                    replacer.style.textAlign = computed.textAlign;
+                    replacer.style.lineHeight = computed.lineHeight;
+                    replacer.style.letterSpacing = computed.letterSpacing;
+                    
+                    // A correção do corte de texto: Permitir transbordo visual ou largura automática
+                    if (isTextarea) {
+                        replacer.style.width = computed.width;
+                        replacer.style.height = computed.height;
+                        replacer.style.whiteSpace = 'pre-wrap';
+                        replacer.style.wordBreak = 'break-word';
+                    } else {
+                        replacer.style.width = 'auto'; // Deixa crescer para não cortar
+                        replacer.style.minWidth = computed.width;
+                        replacer.style.whiteSpace = 'nowrap';
+                    }
+                    
+                    replacer.style.padding = computed.padding;
+                    replacer.style.display = 'flex';
+                    replacer.style.alignItems = isTextarea ? 'flex-start' : 'center';
+                    replacer.style.justifyContent = computed.textAlign === 'center' ? 'center' : (computed.textAlign === 'right' ? 'flex-end' : 'flex-start');
+                    replacer.style.overflow = 'visible'; // CRÍTICO: Não esconder o conteúdo se passar 1 pixel
+                    replacer.style.boxSizing = 'border-box';
+                    replacer.style.border = 'none'; // Some com a borda tracejada no print
+                    replacer.style.background = 'transparent';
+
+                    input.parentNode.insertBefore(replacer, input);
+                    input.style.display = 'none';
+                    
+                    printReplacements.push({ input, replacer });
+                });
+            }
+
+            function restoreInputsAfterPrint() {
+                printReplacements.forEach(({ input, replacer }) => {
+                    input.style.display = ''; // Restaura
+                    replacer.remove(); // Limpa a div falsa
+                });
+                printReplacements = [];
+            }
+
+            // Função para exibir o aviso verde na tela
+            function showToast(message, isError = false) {
+                const toast = document.getElementById('toast-notification');
+                const msgEl = document.getElementById('toast-message');
+                const iconSuccess = document.getElementById('toast-icon-success');
+                const iconError = document.getElementById('toast-icon-error');
+                
+                msgEl.innerText = message;
+                
+                if (isError) {
+                    toast.classList.replace('bg-gray-800', 'bg-red-800');
+                    iconSuccess.classList.add('hidden');
+                    iconError.classList.remove('hidden');
+                } else {
+                    toast.classList.replace('bg-red-800', 'bg-gray-800');
+                    iconError.classList.add('hidden');
+                    iconSuccess.classList.remove('hidden');
+                }
+
+                toast.classList.remove('opacity-0', 'translate-y-4');
+                
+                setTimeout(() => {
+                    toast.classList.add('opacity-0', 'translate-y-4');
+                }, 4000); // Some depois de 4 segundos
+            }
+
+            // --- 4. EXPORTAR COMO IMAGEM (COPIAR CARTÃO NO CTRL+C) ---
+            document.getElementById('copy-btn').addEventListener('click', () => {
                 const card = document.getElementById('carta-container');
-                const btn = document.getElementById('download-btn');
+                const btn = document.getElementById('copy-btn');
+                const lang = document.getElementById('lang-toggle').checked ? 'pt' : 'en';
                 
                 const originalText = btn.innerHTML;
-                btn.innerHTML = 'Gerando Imagem...';
+                btn.innerHTML = 'Copiando...';
                 btn.classList.add('opacity-50', 'cursor-not-allowed');
 
-                html2canvas(card, {
-                    backgroundColor: null,
-                    scale: 2,
-                    useCORS: true 
-                }).then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = 'minha-carta-ninja.png';
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
+                // Prepara a carta substituindo inputs por divs normais para evitar bugs do html2canvas
+                replaceInputsForPrint(card);
 
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                }).catch(err => {
-                    console.error('Erro ao gerar imagem:', err);
-                    alert('Houve um erro ao gerar a imagem. Tente novamente.');
-                    btn.innerHTML = originalText;
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                });
+                setTimeout(() => {
+                    html2canvas(card, {
+                        backgroundColor: '#e5deb5', 
+                        scale: 3, 
+                        useCORS: true,
+                        logging: false
+                    }).then(canvas => {
+                        canvas.toBlob(blob => {
+                            if (!blob) {
+                                showToast(dict[lang].copied_fail, true);
+                                return;
+                            }
+                            try {
+                                const item = new ClipboardItem({ 'image/png': blob });
+                                navigator.clipboard.write([item]).then(() => {
+                                    showToast(dict[lang].copied_success);
+                                }).catch(err => {
+                                    console.error('Erro de permissão na área de transferência:', err);
+                                    showToast(dict[lang].copied_fail, true);
+                                });
+                            } catch (e) {
+                                console.error('Clipboard API não suportada:', e);
+                                showToast(dict[lang].copied_fail, true);
+                            }
+                        }, 'image/png');
+                    }).catch(err => {
+                        console.error('Erro ao gerar imagem:', err);
+                        showToast(dict[lang].copied_fail, true);
+                    }).finally(() => {
+                        // Restaura os inputs para edição após o print
+                        restoreInputsAfterPrint();
+                        btn.innerHTML = originalText;
+                        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    });
+                }, 100);
             });
 
         });
