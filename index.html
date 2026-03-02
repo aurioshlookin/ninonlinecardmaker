@@ -19,14 +19,13 @@
         
         /* Estilos específicos da carta */
         .ninja-card {
-            background-color: #e5deb5; /* Cor de papel envelhecido/areia */
-            border: 12px solid #5a9b75; /* Borda verde característica */
+            background-color: #e5deb5;
+            border: 12px solid #5a9b75;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
         }
 
-        /* Inputs transparentes na carta */
         .card-input {
             background: transparent;
             border: none;
@@ -41,23 +40,6 @@
             background: rgba(255, 255, 255, 0.3);
         }
 
-        .photo-placeholder {
-            cursor: pointer;
-            transition: transform 0.2s;
-            object-fit: cover;
-            background-color: rgba(0,0,0,0.1);
-        }
-
-        .photo-placeholder:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .hide-on-print {
-            /* Classe usada durante o download da imagem */
-        }
-        
-        /* Ajuste fino para telas menores */
         @media (max-width: 1024px) {
             .app-container {
                 flex-direction: column;
@@ -65,7 +47,19 @@
         }
     </style>
 </head>
-<body class="min-h-screen text-gray-800 p-4 md:p-8 flex items-start justify-center">
+<body class="min-h-screen text-gray-800 p-4 md:p-8 flex flex-col items-center justify-start relative">
+
+    <!-- Toggle de Idioma -->
+    <div class="w-full max-w-7xl flex justify-end mb-4 hide-on-print">
+        <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
+            <span class="text-xs font-bold text-gray-500 transition-colors" id="lang-lbl-en">EN</span>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="lang-toggle" class="sr-only peer">
+                <div class="w-11 h-6 bg-blue-500 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+            </label>
+            <span class="text-xs font-bold text-gray-500 transition-colors" id="lang-lbl-pt">PT-BR</span>
+        </div>
+    </div>
 
     <div class="app-container flex gap-8 w-full max-w-7xl mx-auto">
         
@@ -74,23 +68,37 @@
             <div class="mb-6 border-b pb-4">
                 <h1 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
                     <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    Painel de Criação
+                    <span data-i18n="panel_title">Painel de Criação</span>
                 </h1>
-                <p class="text-sm text-gray-500 mt-1">Edite os gráficos aqui. Textos e imagens podem ser editados clicando diretamente na carta!</p>
+                <p class="text-sm text-gray-500 mt-1" data-i18n="panel_desc">Personalize o visual e os status do seu Ninja aqui.</p>
             </div>
 
-            <!-- Cor da Borda -->
+            <!-- Design e Vilas -->
             <div class="mb-6">
-                <h2 class="font-semibold text-lg mb-3 border-b-2 border-yellow-500 inline-block">Design</h2>
-                <div class="flex items-center gap-3 text-sm">
-                    <label class="block text-gray-600 font-bold">Cor da Borda:</label>
-                    <input type="color" id="card-border-color" value="#5a9b75" class="w-10 h-10 cursor-pointer rounded border-0 p-0 shadow-sm">
+                <h2 class="font-semibold text-lg mb-3 border-b-2 border-yellow-500 inline-block" data-i18n="design">Design</h2>
+                <div class="flex flex-col gap-4 text-sm">
+                    <div class="flex items-center gap-3">
+                        <label class="block text-gray-600 font-bold w-28" data-i18n="border_color">Cor da Borda:</label>
+                        <input type="color" id="card-border-color" value="#5a9b75" class="w-10 h-10 cursor-pointer rounded border-0 p-0 shadow-sm">
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <label class="block text-gray-600 font-bold w-28" data-i18n="village">Origem / Vila:</label>
+                        <select id="village-select" class="border rounded px-2 py-2 flex-grow bg-gray-50 outline-none focus:border-blue-500 font-medium text-gray-800">
+                            <!-- Options serão injetados pelo JS de acordo com o idioma -->
+                            <option value="leaf">Vila da Folha</option>
+                            <option value="leaf-r">Folha (Renegado)</option>
+                            <option value="sand">Vila da Areia</option>
+                            <option value="sand-r">Areia (Renegado)</option>
+                            <option value="mist">Vila da Névoa</option>
+                            <option value="mist-r">Névoa (Renegado)</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
             <!-- Controles do Gráfico Radar (Status) -->
             <div class="mb-6">
-                <h2 class="font-semibold text-lg mb-3 border-b-2 border-green-500 inline-block">Status de Combate (1-5)</h2>
+                <h2 class="font-semibold text-lg mb-3 border-b-2 border-green-500 inline-block" data-i18n="combat_status">Status de Combate (1-5)</h2>
                 <div class="grid grid-cols-2 gap-3 text-sm">
                     <div>
                         <input type="text" id="label-nin-panel" value="Ninjutsu" class="bg-transparent text-gray-600 font-bold w-full outline-none border-b border-dashed border-gray-300 focus:border-green-500 mb-1">
@@ -115,24 +123,12 @@
                 </div>
             </div>
 
-            <!-- Controles de Missões -->
-            <div class="mb-6">
-                <h2 class="font-semibold text-lg mb-3 border-b-2 border-red-500 inline-block">Missões Concluídas</h2>
-                <div class="grid grid-cols-3 gap-3 text-sm">
-                    <div><label class="block font-bold">Rank S</label><input type="number" id="miss-s" value="0" class="w-full border rounded px-2 py-1"></div>
-                    <div><label class="block font-bold text-red-600">Rank A</label><input type="number" id="miss-a" value="0" class="w-full border rounded px-2 py-1"></div>
-                    <div><label class="block font-bold text-orange-500">Rank B</label><input type="number" id="miss-b" value="11" class="w-full border rounded px-2 py-1"></div>
-                    <div><label class="block font-bold text-green-600">Rank C</label><input type="number" id="miss-c" value="20" class="w-full border rounded px-2 py-1"></div>
-                    <div><label class="block font-bold text-blue-600">Rank D</label><input type="number" id="miss-d" value="35" class="w-full border rounded px-2 py-1"></div>
-                </div>
-            </div>
-
             <!-- Botão de Download -->
-            <button id="download-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition flex items-center justify-center gap-2">
+            <button id="download-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded shadow transition flex items-center justify-center gap-2 mt-4">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                Baixar Carta como Imagem
+                <span data-i18n="download_btn">Baixar Carta como Imagem</span>
             </button>
-            <p class="text-xs text-center text-gray-400 mt-2">Dica: Clique nas imagens e textos da carta ao lado para personalizá-los diretamente!</p>
+            <p class="text-xs text-center text-gray-400 mt-2" data-i18n="hint">Dica: Os textos também podem ser editados clicando neles na própria carta!</p>
         </div>
 
         <!-- CARTA NINJA (Preview) -->
@@ -141,8 +137,8 @@
             <div id="carta-container" class="ninja-card w-[480px] h-[680px] rounded flex flex-col p-4">
                 
                 <!-- Cabeçalho -->
-                <div class="flex justify-between items-center mb-4">
-                    <!-- Símbolo da Folha (Konoha) -->
+                <div class="flex justify-between items-center mb-6">
+                    <!-- Símbolo Genérico da Vila (Decorativo esquerdo) -->
                     <div class="w-12 h-12 flex items-center justify-center">
                         <svg viewBox="0 0 100 100" class="w-10 h-10 text-gray-800" fill="currentColor">
                             <path d="M50,10 C27.9,10 10,27.9 10,50 C10,72.1 27.9,90 50,90 C72.1,90 90,72.1 90,50 C90,41.5 87.3,33.6 82.8,27.1 L75.7,34.2 C78.4,38.7 80,44.1 80,50 C80,66.5 66.5,80 50,80 C33.5,80 20,66.5 20,50 C20,33.5 33.5,20 50,20 C54.3,20 58.4,20.9 62.1,22.5 L69.5,15.1 C63.7,11.8 57,10 50,10 Z" />
@@ -151,37 +147,47 @@
                         </svg>
                     </div>
                     
-                    <!-- Fogo e Texto Konoha -->
-                    <div class="flex items-center gap-2">
-                        <div class="bg-red-600 rounded-full w-10 h-10 flex items-center justify-center text-white font-bold text-xl border-2 border-red-800 shadow-sm">
-                            火
+                    <!-- Símbolo Dinâmico (Fogo, Água, etc) e Texto -->
+                    <div class="flex items-center gap-2 relative">
+                        <!-- Círculo do símbolo -->
+                        <div id="village-symbol-container" class="bg-red-600 rounded-full w-10 h-10 flex items-center justify-center border-2 border-red-800 shadow-sm relative overflow-hidden transition-colors flex-shrink-0">
+                            <span id="symbol-text" class="text-white font-bold text-xl relative z-10">火</span>
+                            <!-- Risco de renegado (escondido por padrão) -->
+                            <div id="renegade-slash" class="absolute w-full h-1 bg-gray-900 -rotate-45 hidden z-20 shadow-sm top-1/2 -translate-y-1/2"></div>
                         </div>
-                        <h2 class="text-3xl font-bold tracking-widest text-gray-800">木ノ葉</h2>
+                        <!-- Ajuste de largura e tamanho para caber o texto todo -->
+                        <input type="text" id="village-name-input" value="Vila da Folha" class="text-xl font-bold tracking-wider text-gray-800 bg-transparent outline-none w-48 hover:bg-white/50 focus:bg-white/80 rounded cursor-text px-1 text-left" title="Nome da Vila (Editável)">
                     </div>
                 </div>
 
                 <!-- Seção Superior: Dados e Foto -->
-                <div class="flex gap-4 mb-4 flex-grow">
-                    <!-- Dados -->
-                    <div class="flex-1 flex flex-col justify-end gap-3 pb-4">
+                <div class="flex gap-4 mb-6"> 
+                    <!-- Dados (Alinhado ao topo) -->
+                    <div class="flex-1 flex flex-col justify-start gap-4 pt-1">
                         <div class="flex items-end">
-                            <span class="font-bold text-sm whitespace-nowrap mr-2">Registro N.º:</span>
-                            <input type="text" value="012561" class="card-input font-mono text-sm">
+                            <span class="font-bold text-sm whitespace-nowrap mr-2" data-i18n="rank_label">Tierlist Rank:</span>
+                            <input type="text" value="S" class="card-input font-mono text-sm font-bold text-red-700 w-16">
                         </div>
                         <div class="flex items-end">
-                            <span class="font-bold text-sm whitespace-nowrap mr-2">Especialidade:</span>
+                            <span class="font-bold text-sm whitespace-nowrap mr-2" data-i18n="specialty_label">Especialidade:</span>
                             <input type="text" value="Taijutsu" class="card-input font-bold text-sm">
                         </div>
                         <div class="flex flex-col">
-                            <span class="font-bold text-sm">Observações:</span>
-                            <textarea class="card-input text-xs resize-none h-24 bg-white/40 p-1 rounded mt-1" spellcheck="false">Gênio do trabalho duro. Incapaz de usar Ninjutsu ou Genjutsu. Pode abrir os Portões Internos.</textarea>
+                            <span class="font-bold text-sm" data-i18n="obs_label">Observações:</span>
+                            <textarea id="obs-textarea" class="card-input text-xs resize-none h-32 bg-white/40 p-2 rounded mt-1 leading-relaxed" spellcheck="false">Gênio do trabalho duro. Incapaz de usar Ninjutsu ou Genjutsu. Pode abrir os Portões Internos.</textarea>
                         </div>
                     </div>
 
                     <!-- Foto Principal -->
-                    <div class="w-40 flex flex-col items-center justify-end">
-                        <div class="w-32 h-40 bg-white border-2 border-gray-400 p-1 shadow-md rotate-2 mb-2 relative">
-                            <img id="img-main" src="https://i.pinimg.com/236x/8f/2c/8d/8f2c8d5d9990391f1ba4fba97da5f21f.jpg" alt="Ninja" class="w-full h-full object-cover photo-placeholder" title="Clique para trocar a foto">
+                    <div class="w-40 flex flex-col items-center justify-start">
+                        <div class="w-32 h-40 bg-white border-2 border-gray-400 p-1 shadow-md rotate-2 mb-3 relative cursor-pointer group" onclick="document.getElementById('file-main').click()">
+                            <!-- Mensagem "Enviar Imagem" fixa no fundo -->
+                            <div class="absolute inset-1 border-2 border-dashed border-gray-300 bg-gray-50 flex flex-col items-center justify-center text-gray-400 z-0">
+                                <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                <span data-i18n="upload_text" class="text-xs font-bold text-center leading-tight">Enviar<br>Imagem</span>
+                            </div>
+                            <!-- Imagem (Transparente no início para mostrar o fundo) -->
+                            <img id="img-main" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="" class="w-full h-full object-cover relative z-10" title="Clique para alterar a foto">
                             <input type="file" id="file-main" class="hidden" accept="image/*">
                         </div>
                         <div class="w-full bg-[#9cb3d4] border-2 border-[#7a93b5] rounded-sm p-1 text-center shadow-sm">
@@ -190,34 +196,43 @@
                     </div>
                 </div>
 
-                <!-- Seção Inferior: Gráficos e Missões -->
-                <div class="flex-grow flex justify-between items-end relative">
+                <!-- Seção Inferior: Gráficos (Maior Destaque) -->
+                <div class="flex-grow flex justify-between items-center relative px-2 pb-6">
                     
-                    <!-- Gráfico de Barras (Genérico) -->
-                    <div class="w-24 h-28 bg-white/50 border border-gray-400 p-1 rounded-sm shadow-inner relative bottom-2">
-                        <canvas id="barChart"></canvas>
+                    <!-- Gráfico de Barras (Apenas Barras) -->
+                    <div class="w-32 h-44 bg-white/50 border border-gray-400 p-2 rounded-sm shadow-inner relative z-10 flex flex-col mb-4">
+                        <div class="flex-grow relative w-full">
+                            <canvas id="barChart"></canvas>
+                        </div>
                     </div>
 
-                    <!-- Gráfico Radar Principal -->
-                    <div class="w-52 h-52 absolute left-1/2 bottom-0 transform -translate-x-1/2 translate-y-2">
+                    <!-- Gráfico Radar Principal (Maior) -->
+                    <div class="relative w-64 h-64 mr-2">
                         <canvas id="radarChart"></canvas>
-                        <!-- Rótulos editáveis para estilo oriental/personalizado -->
-                        <input type="text" value="忍" class="absolute top-0 left-1/2 -translate-x-1/2 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Ninjutsu -->
-                        <input type="text" value="体" class="absolute top-[35%] right-0 translate-x-1 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Taijutsu -->
-                        <input type="text" value="幻" class="absolute bottom-4 right-4 translate-x-2 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Genjutsu -->
-                        <input type="text" value="知" class="absolute bottom-4 left-4 -translate-x-2 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Inteligência -->
-                        <input type="text" value="力" class="absolute top-[35%] left-0 -translate-x-1 text-xs font-bold text-gray-700 bg-transparent text-center w-8 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text" title="Abreviação"> <!-- Força -->
+                        
+                        <!-- Rótulos dinâmicos (Nomes) e Kanjis (Pontas externas) -->
+                        <div class="absolute -top-7 left-1/2 -translate-x-1/2 flex flex-col items-center">
+                            <span class="text-xs font-bold text-gray-500 mb-0.5">忍</span> <!-- Kanji fora -->
+                            <input type="text" id="label-nin-card" value="Ninjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        </div>
+                        <div class="absolute top-[26%] -right-10 flex flex-col items-center">
+                            <span class="text-xs font-bold text-gray-500 mb-0.5">体</span>
+                            <input type="text" id="label-tai-card" value="Taijutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        </div>
+                        <div class="absolute -bottom-6 -right-6 flex flex-col items-center">
+                            <span class="text-xs font-bold text-gray-500 mb-0.5">幻</span>
+                            <input type="text" id="label-gen-card" value="Genjutsu" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        </div>
+                        <div class="absolute -bottom-6 -left-6 flex flex-col items-center">
+                            <span class="text-xs font-bold text-gray-500 mb-0.5">知</span>
+                            <input type="text" id="label-int-card" value="Inteligência" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        </div>
+                        <div class="absolute top-[26%] -left-10 flex flex-col items-center">
+                            <span class="text-xs font-bold text-gray-500 mb-0.5">力</span>
+                            <input type="text" id="label-str-card" value="Força" class="text-[11px] font-bold text-gray-800 bg-transparent text-center w-28 outline-none hover:bg-white/50 focus:bg-white/80 rounded cursor-text leading-none">
+                        </div>
                     </div>
 
-                    <!-- Missões Completadas -->
-                    <div class="w-24 text-xs">
-                        <div class="font-bold border-b border-gray-500 mb-1 text-center">Missões</div>
-                        <div class="flex justify-between border-b border-gray-400 border-dashed py-0.5"><span>S</span> <span id="disp-s" class="font-mono">0</span></div>
-                        <div class="flex justify-between border-b border-gray-400 border-dashed py-0.5"><span>A</span> <span id="disp-a" class="font-mono">0</span></div>
-                        <div class="flex justify-between border-b border-gray-400 border-dashed py-0.5"><span>B</span> <span id="disp-b" class="font-mono">11</span></div>
-                        <div class="flex justify-between border-b border-gray-400 border-dashed py-0.5"><span>C</span> <span id="disp-c" class="font-mono">20</span></div>
-                        <div class="flex justify-between py-0.5"><span>D</span> <span id="disp-d" class="font-mono">35</span></div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -226,13 +241,112 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+
+            // --- 0. DICIONÁRIO E INTERNACIONALIZAÇÃO (i18n) ---
+            const dict = {
+                en: {
+                    panel_title: "Creation Panel",
+                    panel_desc: "Customize your Ninja's visual and stats here.",
+                    design: "Design",
+                    border_color: "Border Color:",
+                    village: "Origin / Village:",
+                    combat_status: "Combat Status (1-5)",
+                    download_btn: "Download Card as Image",
+                    hint: "Hint: Texts can also be edited by clicking directly on the card!",
+                    rank_label: "Tierlist Rank:",
+                    specialty_label: "Specialty:",
+                    obs_label: "Notes:",
+                    obs_default: "Genius of hard work. Unable to use Ninjutsu or Genjutsu. Can open the Inner Gates.",
+                    upload_text: "Upload<br>Image",
+                    villages: {
+                        'leaf': 'Hidden Leaf',
+                        'leaf-r': 'Rogue Leaf',
+                        'sand': 'Hidden Sand',
+                        'sand-r': 'Rogue Sand',
+                        'mist': 'Hidden Mist',
+                        'mist-r': 'Rogue Mist'
+                    },
+                    stats: ['Ninjutsu', 'Taijutsu', 'Genjutsu', 'Intelligence', 'Strength']
+                },
+                pt: {
+                    panel_title: "Painel de Criação",
+                    panel_desc: "Personalize o visual e os status do seu Ninja aqui.",
+                    design: "Design",
+                    border_color: "Cor da Borda:",
+                    village: "Origem / Vila:",
+                    combat_status: "Status de Combate (1-5)",
+                    download_btn: "Baixar Carta como Imagem",
+                    hint: "Dica: Os textos também podem ser editados clicando neles na própria carta!",
+                    rank_label: "Tierlist Rank:",
+                    specialty_label: "Especialidade:",
+                    obs_label: "Observações:",
+                    obs_default: "Gênio do trabalho duro. Incapaz de usar Ninjutsu ou Genjutsu. Pode abrir os Portões Internos.",
+                    upload_text: "Enviar<br>Imagem",
+                    villages: {
+                        'leaf': 'Vila da Folha',
+                        'leaf-r': 'Folha (Renegado)',
+                        'sand': 'Vila da Areia',
+                        'sand-r': 'Areia (Renegado)',
+                        'mist': 'Vila da Névoa',
+                        'mist-r': 'Névoa (Renegado)'
+                    },
+                    stats: ['Ninjutsu', 'Taijutsu', 'Genjutsu', 'Inteligência', 'Força']
+                }
+            };
+
+            // Detectar Idioma (se é derivado de pt, usa PT. Senão, EN)
+            const userLang = (navigator.language || navigator.userLanguage).toLowerCase();
+            let isPt = userLang.startsWith('pt');
             
+            const langToggle = document.getElementById('lang-toggle');
+            langToggle.checked = isPt;
+
+            const applyLanguage = (lang) => {
+                const d = dict[lang];
+
+                // Atualizar textos fixos
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (d[key]) el.innerHTML = d[key];
+                });
+
+                // Atualizar opções do Select (Dropdown)
+                const select = document.getElementById('village-select');
+                Array.from(select.options).forEach(opt => {
+                    opt.text = d.villages[opt.value];
+                });
+
+                // Atualizar Texto Principal da Vila na Carta p/ ficar sincronizado
+                document.getElementById('village-name-input').value = select.options[select.selectedIndex].text;
+
+                // Atualizar Textarea de Observações
+                document.getElementById('obs-textarea').value = d.obs_default;
+
+                // Atualizar Status / Atributos
+                const statInputs = ['nin', 'tai', 'gen', 'int', 'str'];
+                statInputs.forEach((stat, index) => {
+                    document.getElementById(`label-${stat}-panel`).value = d.stats[index];
+                    document.getElementById(`label-${stat}-card`).value = d.stats[index];
+                    if (window.barChart) {
+                        window.barChart.data.labels[index] = d.stats[index].substring(0, 3);
+                    }
+                });
+                if (window.barChart) window.barChart.update();
+
+                // Destaque visual do toggle
+                if(lang === 'pt') {
+                    document.getElementById('lang-lbl-pt').classList.replace('text-gray-500', 'text-green-600');
+                    document.getElementById('lang-lbl-en').classList.replace('text-blue-600', 'text-gray-500');
+                } else {
+                    document.getElementById('lang-lbl-en').classList.replace('text-gray-500', 'text-blue-600');
+                    document.getElementById('lang-lbl-pt').classList.replace('text-green-600', 'text-gray-500');
+                }
+            };
+
             // --- 1. CONFIGURAÇÃO DE UPLOAD DE IMAGENS ---
-            const setupImageUpload = (imgId, inputId) => {
-                const img = document.getElementById(imgId);
+            const setupImageUpload = (inputId, imgId) => {
                 const input = document.getElementById(inputId);
-                
-                img.addEventListener('click', () => input.click());
+                const img = document.getElementById(imgId);
                 
                 input.addEventListener('change', function(e) {
                     if (e.target.files && e.target.files[0]) {
@@ -245,12 +359,13 @@
                 });
             };
 
-            setupImageUpload('img-main', 'file-main');
+            setupImageUpload('file-main', 'img-main');
 
             // --- 2. CONFIGURAÇÃO DOS GRÁFICOS (Chart.js) ---
             Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
+            const initialData = [3, 5, 1, 3, 4];
             
-            // Gráfico Radar (Status)
+            // Gráfico Radar
             const ctxRadar = document.getElementById('radarChart').getContext('2d');
             const radarChart = new Chart(ctxRadar, {
                 type: 'radar',
@@ -258,57 +373,12 @@
                     labels: ['Ninjutsu', 'Taijutsu', 'Genjutsu', 'Inteligência', 'Força'],
                     datasets: [{
                         label: 'Status',
-                        data: [3, 5, 1, 3, 4], // Valores iniciais (Rock Lee aprox)
+                        data: [...initialData],
                         backgroundColor: 'rgba(220, 38, 38, 0.6)', // Vermelho Translúcido
                         borderColor: 'rgba(220, 38, 38, 1)',
                         borderWidth: 1.5,
                         pointBackgroundColor: 'rgba(220, 38, 38, 1)',
-                        pointRadius: 0 // Esconde os pontos para ficar mais parecido com o anime
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    },
-                    scales: {
-                        r: {
-                            min: 0,
-                            max: 5,
-                            ticks: { display: false, stepSize: 1 },
-                            grid: {
-                                color: 'rgba(88, 140, 115, 0.5)', // Cor da teia de aranha (verde escuro)
-                                lineWidth: 1.5
-                            },
-                            angleLines: {
-                                color: 'rgba(88, 140, 115, 0.5)',
-                                lineWidth: 1.5
-                            },
-                            pointLabels: {
-                                display: false // Escondemos as labels nativas para usar HTML absoluto (mais fiel visualmente)
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Gráfico de Barras (Canto Inferior Esquerdo)
-            const ctxBar = document.getElementById('barChart').getContext('2d');
-            const barChart = new Chart(ctxBar, {
-                type: 'bar',
-                data: {
-                    labels: ['A', 'B', 'C'],
-                    datasets: [{
-                        data: [80, 50, 65],
-                        backgroundColor: [
-                            'rgba(220, 38, 38, 0.8)', // Red
-                            'rgba(34, 197, 94, 0.8)', // Green
-                            'rgba(59, 130, 246, 0.8)'  // Blue
-                        ],
-                        borderWidth: 0,
-                        barPercentage: 0.7
+                        pointRadius: 0
                     }]
                 },
                 options: {
@@ -316,8 +386,44 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { enabled: false } },
                     scales: {
-                        x: { display: false, grid: { display: false } },
-                        y: { display: false, min: 0, max: 100, grid: { display: false } }
+                        r: {
+                            min: 0,
+                            max: 5,
+                            ticks: { display: false, stepSize: 1 },
+                            grid: { color: 'rgba(88, 140, 115, 0.5)', lineWidth: 1.5 },
+                            angleLines: { color: 'rgba(88, 140, 115, 0.5)', lineWidth: 1.5 },
+                            pointLabels: { display: false }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Barras
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            window.barChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Nin', 'Tai', 'Gen', 'Int', 'For'],
+                    datasets: [{
+                        data: [...initialData],
+                        backgroundColor: [
+                            'rgba(220, 38, 38, 0.8)',   // Vermelho (Nin)
+                            'rgba(34, 197, 94, 0.8)',   // Verde (Tai)
+                            'rgba(168, 85, 247, 0.8)',  // Roxo (Gen)
+                            'rgba(59, 130, 246, 0.8)',  // Azul (Int)
+                            'rgba(234, 179, 8, 0.8)'    // Amarelo (For)
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                    scales: {
+                        x: { display: false }, // Remove Nomes debaixo
+                        y: { min: 0, max: 5, display: false } // Remove eixos laterais
                     },
                     layout: { padding: 0 }
                 }
@@ -326,22 +432,36 @@
 
             // --- 3. LIGAR O PAINEL DE CONTROLE AOS ELEMENTOS ---
 
-            // Atualizar Gráfico Radar
-            const statInputs = ['nin', 'tai', 'gen', 'int', 'str'];
-            statInputs.forEach((stat, index) => {
+            // Inicializar Idioma após carregar o BarChart
+            applyLanguage(isPt ? 'pt' : 'en');
+            langToggle.addEventListener('change', (e) => applyLanguage(e.target.checked ? 'pt' : 'en'));
+
+            // Sincronizar Gráficos Simultaneamente
+            const statInputsList = ['nin', 'tai', 'gen', 'int', 'str'];
+            statInputsList.forEach((stat, index) => {
                 const input = document.getElementById(`stat-${stat}`);
                 const panelLabel = document.getElementById(`label-${stat}-panel`);
+                const cardLabel = document.getElementById(`label-${stat}-card`);
                 
+                // Mudar valor numérico nas barras
                 input.addEventListener('input', (e) => {
-                    radarChart.data.datasets[0].data[index] = parseFloat(e.target.value);
+                    const val = parseFloat(e.target.value);
+                    radarChart.data.datasets[0].data[index] = val;
                     radarChart.update();
+                    window.barChart.data.datasets[0].data[index] = val;
+                    window.barChart.update();
                 });
                 
-                // Atualiza também os rótulos internos do ChartJS
-                panelLabel.addEventListener('input', (e) => {
-                    radarChart.data.labels[index] = e.target.value;
-                    radarChart.update();
-                });
+                // Sincronizar mudança de Nomes dos status
+                const syncLabels = (val) => {
+                    panelLabel.value = val;
+                    cardLabel.value = val;
+                    window.barChart.data.labels[index] = val.substring(0, 3);
+                    window.barChart.update();
+                };
+
+                panelLabel.addEventListener('input', (e) => syncLabels(e.target.value));
+                cardLabel.addEventListener('input', (e) => syncLabels(e.target.value));
             });
 
             // Lógica da Cor da Borda
@@ -349,40 +469,59 @@
                 document.getElementById('carta-container').style.borderColor = e.target.value;
             });
 
-            // Atualizar Textos de Missão
-            const missInputs = ['s', 'a', 'b', 'c', 'd'];
-            missInputs.forEach(rank => {
-                const input = document.getElementById(`miss-${rank}`);
-                const display = document.getElementById(`disp-${rank}`);
-                input.addEventListener('input', (e) => {
-                    display.innerText = e.target.value;
-                });
+            // Seletor de Vilas (Muda a Cor do Símbolo, o Kanji, o Risco e Sincroniza o Nome)
+            const configs = {
+                'leaf':   { s: '火', bg: '#dc2626', r: false },
+                'leaf-r': { s: '火', bg: '#6b7280', r: true },
+                'sand':   { s: '風', bg: '#ea580c', r: false },
+                'sand-r': { s: '風', bg: '#6b7280', r: true },
+                'mist':   { s: '水', bg: '#2563eb', r: false },
+                'mist-r': { s: '水', bg: '#6b7280', r: true }
+            };
+
+            document.getElementById('village-select').addEventListener('change', (e) => {
+                const val = e.target.value;
+                const chosen = configs[val];
+                
+                document.getElementById('symbol-text').innerText = chosen.s;
+                
+                const container = document.getElementById('village-symbol-container');
+                container.style.backgroundColor = chosen.bg;
+                container.style.borderColor = chosen.bg;
+                
+                const slash = document.getElementById('renegade-slash');
+                if (chosen.r) slash.classList.remove('hidden');
+                else slash.classList.add('hidden');
+
+                // Sincronizar o input de nome da vila na carta com o texto atual da option
+                const optionText = e.target.options[e.target.selectedIndex].text;
+                document.getElementById('village-name-input').value = optionText;
             });
 
+            // Evitar quebra do input de Vila se o usuário escrever algo muito gigante.
+            document.getElementById('village-name-input').addEventListener('input', (e) => {
+                // Aqui o input é livre para edição manual, a sincronização é unidirecional (select -> input)
+            });
 
             // --- 4. EXPORTAR COMO IMAGEM ---
             document.getElementById('download-btn').addEventListener('click', () => {
                 const card = document.getElementById('carta-container');
                 const btn = document.getElementById('download-btn');
                 
-                // Mudar texto do botão para indicar carregamento
                 const originalText = btn.innerHTML;
                 btn.innerHTML = 'Gerando Imagem...';
                 btn.classList.add('opacity-50', 'cursor-not-allowed');
 
-                // Usar html2canvas
                 html2canvas(card, {
-                    backgroundColor: null, // Manter transparente ou fundo da carta
-                    scale: 2, // Maior resolução
-                    useCORS: true // Permite imagens externas se configuradas corretamente
+                    backgroundColor: null,
+                    scale: 2,
+                    useCORS: true 
                 }).then(canvas => {
-                    // Criar link de download
                     const link = document.createElement('a');
                     link.download = 'minha-carta-ninja.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
 
-                    // Restaurar botão
                     btn.innerHTML = originalText;
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }).catch(err => {
